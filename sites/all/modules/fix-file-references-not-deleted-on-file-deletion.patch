@@ -1,0 +1,35 @@
+diff --git a/file_entity.file.inc b/file_entity.file.inc
+index d5cfadc..31df4c3 100644
+--- a/file_entity.file.inc
++++ b/file_entity.file.inc
+@@ -149,9 +149,30 @@
+   if (module_exists('search')) {
+     search_reindex($file->fid, 'file');
+   }
++  
++  file_delete_references($file);
+ }
+ 
+ /**
++ * Delete references to a file
++ */
++function file_delete_references($entity) {
++  $fields = field_info_fields();
++  
++  foreach ($fields as $field_name => $file_field) {
++    if ($file_field['type'] == 'file') {
++      db_delete('field_revision_' . $field_name)
++        ->condition($field_name . '_fid', $entity->fid)
++        ->execute();
++      
++      db_delete('field_data_' . $field_name)
++        ->condition($field_name . '_fid', $entity->fid)
++        ->execute();
++    }
++  }
++}
++
++/**
+  * Implements hook_file_mimetype_mapping_alter().
+  */
+ function file_entity_file_mimetype_mapping_alter(&$mapping) {

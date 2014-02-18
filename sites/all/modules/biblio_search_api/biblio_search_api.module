@@ -1,0 +1,48 @@
+<?php
+
+/*
+ * Implements hook_entity_property_info_alter()
+ */
+function biblio_search_api_entity_property_info_alter(&$info) {
+	$biblioFieldNamesQuery = db_select('biblio_fields', 'n');
+	$biblioFieldNamesQuery->fields('n', array('name'));
+
+	foreach ($biblioFieldNamesQuery->execute()->fetchCol() as $curFieldName) {
+		if ( in_array($curFieldName,array('biblio_authors')) ) {
+			$callBackItemType='getter callback';
+			$callBackItemValue='_setEntityPropertyAuthorValueCallback';
+		} else {
+			$callBackItemType='setter callback';
+			$callBackItemValue='entity_property_verbatim_set';
+		}
+
+		$info['node']['properties'][$curFieldName] = array(
+			'type' => 'text',
+			'label' => t($curFieldName),
+			$callBackItemType => $callBackItemValue,
+		);
+	}
+
+	$info['node']['properties']['biblio_pub_type'] = array(
+		'type' => 'text',
+		'label' => t('biblio_pub_type'),
+		'sanitized' => TRUE,
+		'getter callback' => '_setEntityPropertyBiblioTypeValueCallback',
+	);
+}
+
+function _setEntityPropertyAuthorValueCallback($item) {
+	$authorNames=array();
+	foreach ($item->biblio_contributors as $curContributor) {
+		$authorNames[]=$curContributor['name'];
+	}
+	return(implode(', ',$authorNames));
+}
+
+function _setEntityPropertyBiblioTypeValueCallback($item) {
+  $biblio_type=$item->biblio_type;
+
+  $query=db_query("SELECT name FROM biblio_types WHERE tid = :bibtype", array(':bibtype' => $biblio_type))->fetchField();
+
+  return $query;
+}

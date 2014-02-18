@@ -1,0 +1,31 @@
+diff --git a/js/modal.js b/js/modal.js
+index acb2227..9a3355e 100644
+--- a/js/modal.js
++++ b/js/modal.js
+@@ -386,7 +386,7 @@
+     if( docHeight < winHeight ) docHeight = winHeight;
+ 
+     // Create our divs
+-    $('body').append('<div id="modalBackdrop" style="z-index: 1000; display: none;"></div><div id="modalContent" style="z-index: 1001; position: absolute;">' + $(content).html() + '</div>');
++    $('body').append('<div id="modalBackdrop" style="z-index: 1000; display: none;"></div><div id="modalContent" style="z-index: 1001; position: fixed;">' + $(content).html() + '</div>');
+ 
+     // Keyboard and focus event handler ensures focus stays on modal elements only
+     modalEventHandler = function( event ) {
+@@ -419,7 +419,7 @@
+     var modalContent = $('#modalContent').css('top','-1000px');
+     var mdcTop = wt + ( winHeight / 2 ) - (  modalContent.outerHeight() / 2);
+     var mdcLeft = ( winWidth / 2 ) - ( modalContent.outerWidth() / 2);
+-    $('#modalBackdrop').css(css).css('top', 0).css('height', docHeight + 'px').css('width', docWidth + 'px').show();
++    $('#modalBackdrop').css(css).css('top', 0).css('height', '100%').css('width', '100%').show();
+     modalContent.css({top: mdcTop + 'px', left: mdcLeft + 'px'}).hide()[animation](speed);
+ 
+     // Bind a click for closing the modalContent
+@@ -474,7 +474,7 @@
+       var mdcLeft = ( winWidth / 2 ) - ( modalContent.outerWidth() / 2);
+ 
+       // Apply the changes
+-      $('#modalBackdrop').css('height', docHeight + 'px').css('width', docWidth + 'px').show();
++      $('#modalBackdrop').css('height', '100%').css('width', '100%').show();
+       modalContent.css('top', mdcTop + 'px').css('left', mdcLeft + 'px').show();
+     };
+     $(window).bind('resize', modalContentResize);

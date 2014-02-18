@@ -1,0 +1,48 @@
+<?php
+/**
+ * Implements hook_search_api_ajax_settings().
+ */
+function mymodule_search_api_ajax_settings() {
+  $settings = array(
+  
+    // CSS id for main content (search results html)
+    // format: content => CSS id
+    'content' => '#block-system-main',
+    
+    // CSS id's for regions containing search blocks
+    // check your region names in mytheme.info
+    // format: region_name => CSS id
+    'regions' => array(
+      'sidebar_first' => 'div.sidebar-first',
+      'sidebar_second' => 'div.sidebar-second',
+    ),
+    
+    // OPTIONAL: if you want to provide an AJAX spinner
+    // this paht is for a default spinner path provided with this module
+    // @note: see the search_api_ajax.css
+    'spinner' => drupal_get_path('module', 'search_api_ajax') .'/spinner.gif',
+    
+    // OPTIONAL: if you want to use scroll-to-top functionality when paging
+    // scroll target div
+    'scrolltarget' => '#main-content',
+    'scrollspeed' => 1000,
+    
+    // OPTIONAL: if you want to fade search results when Ajaxing
+    // please set to 1 for TRUE
+    'fade' => 1,
+    'opacity' => 0.3,    
+  );
+  
+  return $settings;
+}
+
+/**
+ * Implements hook_search_api_ajax_modules_alter().
+ *
+ * Add custom modules to search api ajax blocks.
+ */
+function mycustommodule_search_api_ajax_modules_alter(&$modules) {
+  $modules[] = 'facetapi';
+}
+
+?>

@@ -1,0 +1,22 @@
+<?php
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function chosen_facet_form_facetapi_multiselect_form_alter(&$form, &$form_state) {
+  // Add the JavaScript and CSS for the library itself. This assumes you are
+  // using the Libraries module (http://drupal.org/project/libraries) and that
+  // you've put the external library in sites/all/libraries/chosen.
+  // Note: Rather than adding each JS and CSS file individually as is done
+  // below, hook_library() and $form['#attached']['library'][] could be used
+  // instead.
+  $path = libraries_get_path('chosen');
+  $form['#attached']['js'][] = $path . '/chosen.jquery.js';
+  $form['#attached']['js'][] = $path . '/chosen.jquery.min.js';
+  $form['#attached']['css'][] = $path . '/chosen.css';
+  $form['#attached']['css'][] = $path . '/chosen.min.css';
+
+  // Add a custom JavaScript file which will trigger the Chosen
+  // widget on the correct form elements.
+  $form['#attached']['js'][] = drupal_get_path('module', 'MYMODULE') . '/js/chosen_facet.js';
+}
+?>

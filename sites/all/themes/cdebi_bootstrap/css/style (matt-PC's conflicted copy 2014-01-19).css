@@ -1,0 +1,484 @@
+/** TOP NAVIGATION BAR **/
+#navbar {
+	margin-bottom:16px;
+}
+.logo {
+	float: left;
+	margin-right:15px;
+	margin-top:5px;
+}
+.navbar-brand {
+	padding-left: 0px;
+}
+.site-name {
+	float: left;
+}
+.site-name a {
+	color: #000000;
+	font-size: 46px;
+	font-weight:bold;
+}
+.block-logintoboggan,
+.block-user {
+	float: right;
+	vertical-align:middle;
+	position: relative;
+    top: 16px;
+}
+.user-menu ul li {
+	float:left;
+}
+.navbar-default {
+    border-color: #dddddd !important;
+    box-shadow: 0 0px 0 rgba(255, 255, 255, 0) !important;
+}
+
+/** MAIN NAVIGATION BAR **/
+.region-navigation {
+	margin-top: 15px;
+}
+#block-system-main-menu {
+    position: relative;
+    top: 6px;
+    left: 12px;
+    float: left;
+}
+.nav-pills > li + li {
+    margin-left: 12px !important;
+}
+.nav-pills > li > a {
+	background-color: #ffffff;
+}
+.nav-pills > li > a.active span.caret {
+	border-top-color: #ffffff;
+}
+.nav-pills ul.dropdown-menu li a:hover {
+	background-color: #428BCA;
+}
+section#block-tb-megamenu-main-menu {
+	display:none !important;
+}
+.tb-megamenu {
+	background-color: transparent !important;
+	color: #777777 !important;
+}
+.tb-megamenu-nav {
+    background-color: #F5F5F5;
+    list-style: none outside none;
+    margin-bottom: 20px !important;
+}
+.tb-megamenu-item a.dropdown-toggle {
+	background-color: #F5F5F5 !important;
+}
+.tb-megamenu-item.animating a,
+.tb-megamenu-item.open a {
+	background-color: #EEEEEE !important;
+}
+.tb-megamenu .nav > .active > a,
+.tb-megamenu .nav > .active > a:hover,
+.tb-megamenu .nav > .active > a:focus {
+	background-color: #EEEEEE !important;
+}
+
+.tb-megamenu-item
+span.caret {
+	display: none !important;
+}
+.tb-megamenu .nav-collapse.collapse {
+display: block !important;
+}
+.tb-megamenu .nav > li > a {
+	border-right: 0px !important;
+	color: #777777 !important;
+}
+.tb-megamenu .dropdown-menu {
+    background-color: #F5F5F5 !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+    border-color: #dddddd !important !important;
+    -webkit-box-shadow:  0 1px 1px rgba(0, 0, 0, 0.05) !important;
+    -moz-box-shadow:  0 1px 1px rgba(0, 0, 0, 0.05) !important;
+    box-shadow:  0 1px 1px rgba(0, 0, 0, 0.05) !important;
+}
+
+/** FACETS **/
+.panel {
+	border: 0px !important;
+}
+.panel-default > .panel-heading {
+	background-color: #b2dba2 !important;
+	font-weight: bold;
+}
+.region-sidebar-first .panel {
+	margin-bottom: 12px;
+}
+.panel-heading {
+	border: 0px !important;
+}
+.panel > .list-group .list-group-item {
+	width:100% !important;
+}
+.panel > .list-group .collapsable {
+	max-width: 95% !important;
+}
+.facetapi-facetapi-links a {
+	font-weight:bold !important;
+}
+.treeview {
+	margin-top: 15px !important;
+	margin-left: 15px !important;
+	margin-bottom: 10px !important;
+}
+.treeview li { 
+	border: none !important;
+}
+.treeview a {
+	position: relative;
+	top: -4px;
+	left: 5px;
+}
+.treeview .activefacet-text
+{
+	position: relative;
+	top: -3px;
+	left: 5px;
+}
+
+/*.block-facetapi li {
+	display:block;
+}*/
+/*.block-facetapi li.expanded {
+	padding-bottom:0px;
+}
+a.facetapi-active {
+	width: auto !important;
+	margin-right: 5px;
+}
+ul.treeview {
+	margin-top:10px;
+	margin-left: 10px;
+	margin-bottom: 10px !important;
+}
+.treeview li {
+    padding: 8px 0 0 16px !important;
+    border: 0px !important;
+}*/
+/*
+.treeview li.collapsable,
+.treeview li.expandable {
+	padding-top: 0px !important;	
+}
+.treeview li.collapsable > a,
+.treeview li.expandable > a {
+	top: -1px !important;
+}
+.treeview li.expanded a {
+	position:relative;
+	top:-9px;
+	left:3px;
+}
+
+.treeview .hitarea {
+    background: url("../js/jquery-treeview/images/treeview-default.gif") no-repeat scroll -64px -23px rgba(0, 0, 0, 0) !important;
+}
+.treeview .lastCollapsable .hitarea, .treeview .lastExpandable .hitarea {
+	position: relative;
+	top: 1px;
+}*/
+
+
+a.facetapi-inactive .glyphicon {
+	margin-right:5px;
+}
+.glyphicon {
+	font-size: 0.85em;
+}
+a.facetapi-inactive span.badge {
+	margin-left:3px;
+	font-size: 10px;
+	padding: 3px 5px;
+	vertical-align: text-top;
+	background-color: #b2dba2;
+	display:none;
+}
+
+
+
+
+/** VIEWS FILTERS **/
+.views-widget-filter-search_api_views_fulltext,
+.region-sidebar-first label,
+#block-system-main .view label {
+}
+.view-filters {
+	margin-bottom: 10px;
+}
+.views-exposed-form {
+	display:table;
+}
+.views-exposed-widgets {
+	display:table-row !important;
+}
+.views-exposed-widget {
+	display:table-cell; 
+	padding:0px !important;
+	width: 100%;
+	float: none !important;
+}
+.views-exposed-widget .views-widget .form-item {
+	display:table;
+	width: 100%;
+}
+.views-exposed-widget .views-widget .form-item .input-group {
+	display:table-row;
+}
+.views-exposed-widget .views-widget .form-item .input-group input.form-text,
+.views-exposed-widget .views-widget .form-item .input-group span {
+	display:table-cell;
+}
+.views-submit-button,
+.views-reset-button {
+	vertical-align:bottom;
+	width: auto !important;
+	display: table-cell;
+	margin-top: 25px;
+	padding-left: 8px !important;
+}
+.views-exposed-widget button {
+    margin-top: 0px !important;
+}
+
+/** LOCATION SELECT WIDGET **/
+#edit-field-locations-wrapper {
+	display: block;
+}
+
+/** SEARCH POSITION **/
+.view-persons table.views-table tr:views-row-first td:views-field {
+	border-bottom: 1px solid #dddddd !important;
+	border-top: 0px !important;
+}
+
+table.views-table .table tbody > tr:first-child > td,
+table.views-table tbody > tr:first-child > td {
+	border-top: 0px !important;
+}
+
+/** VIEW TABLES **/
+table.views-table {
+	background-color: #ffffff;
+}
+#block-system-main table.views-table th {
+	background-color: #b2dba2;
+}
+table.views-table td,
+table.views-table th {
+	padding: 10px 15px !important;
+}
+table.views-table thead tr th {
+    border-bottom: 1px !important;
+}
+.table-curved {
+    border-collapse: separate;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+.table-curved {
+    border: solid #ddd opx;
+    border-radius: 3px;
+    border-left:0px;
+}
+.table-curved td, .table-curved th {
+
+}
+.table-curved td {
+    border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+}
+.table-curved tr td:first-child, .table-curved tr th:first-child {
+    border-left: 0px !important;
+}
+.table-curved th {
+    border-top: none;
+}
+.table-curved th:first-child {
+    border-radius: 3px 0 0 0;
+}
+.table-curved th:last-child {
+    border-radius: 0 3px 0 0;
+}
+.table-curved th:only-child{
+    border-radius: 3px 3px 0 0;
+}
+.table-curved tr:last-child td:first-child {
+    border-radius: 0 0 0 3px;
+}
+.table-curved tr:last-child td:last-child {
+    border-radius: 0 0 3px 0;
+}
+
+/** FLIPPED TABLE **/
+
+.flipped-table table{
+	width: 100%;	
+}
+
+.flipped-table tr td,
+.flipped-table tr th {
+	padding-top: 8px;
+	padding-bottom: 8px;
+	padding-left: 12px;
+	padding-right: 12px;
+	vertical-align:top;
+}
+
+
+/** ALERT INFO BUG **/
+
+
+/** ENTITY CONNECT **/
+.field-type-entityreference .form-type-textfield label {
+	display:block;
+}
+.field-type-entityreference .form-type-textfield input {
+	display:table-cell;
+	width: 350px !important;
+}
+.field-type-entityreference .form-type-textfield span.input-group-addon {
+	display:inline-block;
+	border-left:0px;
+	width:42px;
+	border-bottom-right-radius: 4px;
+	border-top-right-radius: 4px;
+	margin-right:7px;
+}
+.field-type-entityreference .single-value {
+	display:inline;
+	float:none;
+}
+
+/** RADIO BUTTON **/
+.form-type-radio {
+	display:table-cell;
+	padding-right:22px;
+}
+
+/** CHOSEN SELECT **/
+.chosen-container {
+	width:100%;
+}
+.chosen-container .chosen-single {
+    border: 1px solid #dddCCC;
+    border-radius: 4px;
+    color: #555555;
+    display: block;
+    font-size: 14px;
+    height: 34px;
+    line-height: 1.42857;
+    padding: 6px 12px;
+    transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+    vertical-align: middle;
+	width:100%;
+}
+.chosen-single div b {
+	background-position: 0px 7px !important;
+}
+
+/** PANEL PAGE TITLE BUG **/
+.pane-datasets-content-panel-pane-1 h2 {
+	display:none;
+}
+
+/** VIEW MODE MODAL LINK **/
+#modal-content[style] {
+	height: auto !important;
+}
+.view-mode-target-wrapper {
+	background-color: transparent !important;
+}
+
+/** VIEW MODE MODAL TABLE **/
+#modal-content table tr td,
+#modal-content table tr th {
+	padding-top: 8px;
+	padding-bottom: 8px;
+	padding-left: 12px;
+	padding-right: 12px;
+	vertical-align:top;
+}
+
+/** DATASET SEARCH RESULTS **/
+.view-datasets-index table tr td:first-child {
+	max-width: 250px !important;
+}
+
+.view-datasets-content- .views-field-field-locations {
+	margin-right: -3px;
+}
+.view-datasets-content- .views-field .views-label,
+.view-datasets-content- .views-field .field-content,
+.view-datasets-content- .view-output-of-programs-or-events,
+.view-datasets-content- .view-output-of-programs-or-events .view-content,
+.view-datasets-content- .view-output-of-programs-or-events .view-content .views-row, 
+.view-datasets-content- .view-output-of-programs-or-events .view-content .views-row .views-field,
+.view-datasets-content- .view-output-of-programs-or-events .view-content .views-row .views-field, .field-content {
+	display:inline;
+}
+
+.view-datasets-content- .views-field .views-label,
+.view-datasets-content- .views-field-field-data-type-1 {
+	font-weight:bold;
+}
+
+.views-field-field-urls a,
+.views-field-edit-link a {
+    margin-bottom: 5px;
+    margin-top: 7px;
+}
+
+/** PUBLICATION SEARCH RESULTS **/
+.view-publications-index .views-field-rendered-entity .field-content,
+.view-publications-index .views-field-citation,
+.view-publications-index .views-field-citation .field-content,
+.view-publications-index .views-field-edit-node {
+	float: left;
+	display: inline;
+	margin-right: 5px;
+}
+.view-publications-index .views-field-biblio-other-number .field-content {
+	display:block;
+}
+.view-publications-index .views-field-edit-node,
+.view-publications-index .views-field-rendered-entity .field-content{
+	margin-top: 10px !important;
+	margin-bottom: 8px !important;
+}
+.view-publications-index .views-field-edit-node,
+.view-publications-index .views-field-field-images,
+.view-publications-index .views-field-field-files {
+	clear: left;
+}
+
+.views-field-field-images .field-content,
+.views-field-field-files .field-content{
+	float: left;
+	clear: both;
+	margin-bottom: 10px
+}
+.views-field-field-images,
+.views-field-field-files  {
+	margin-bottom: 10px;
+}
+.views-label-field-images,
+.views-label-field-files {
+	font-weight: bold;
+	float: left;
+	clear: both;
+}
+
+
+/** BUTTONS **/
+.btn-info {
+    background-color: #5BC0DE;
+    border-color: #46B8DA;
+}
+

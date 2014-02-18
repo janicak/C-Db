@@ -1,0 +1,14 @@
+name = "Search API Taxonomy"
+core = "7.x"
+dependecies[] = "search_api"
+dependecies[] = "taxonomy"
+
+files[] = "lib/search_api/plugins/processors/taxonomy_heirarchy.inc"
+files[] = "lib/facet_api/plugins/widgets/widget_links.inc"
+
+; Information added by drupal.org packaging script on 2013-10-01
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "search_api_taxonomy"
+datestamp = "1380626878"
+

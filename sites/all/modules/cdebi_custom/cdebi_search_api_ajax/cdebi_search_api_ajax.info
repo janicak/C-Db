@@ -1,0 +1,7 @@
+name = "C-DEBI Search API AJAX"
+description = "Ajaxify Search API Views"
+core = 7.x
+package = "C-DEBI"
+
+
+files[] = cdebi_search_api_ajax.module

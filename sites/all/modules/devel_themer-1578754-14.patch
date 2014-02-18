@@ -1,0 +1,16 @@
+diff --git a/devel_themer.module b/devel_themer.module
+index 4b4554a..0565847 100644
+--- a/devel_themer.module
++++ b/devel_themer.module
+@@ -14,9 +14,10 @@ function devel_themer_menu() {
+     'access arguments' => array('administer site configuration'),
+     'type' => MENU_NORMAL_ITEM,
+   );
+-  $items['devel_themer/variables'] = array(
++  $items['devel_themer/variables/%/%'] = array(
+     'title' => 'Theme Development AJAX variables',
+     'page callback' => 'devel_themer_ajax_variables',
++    'page arguments' => array(2, 3),
+     'delivery callback' => 'ajax_deliver',
+     'access arguments' => array('access devel information'),
+     'type' => MENU_CALLBACK,

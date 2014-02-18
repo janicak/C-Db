@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * Implements hook_search_api_processor_info().
+ */
+function search_api_taxonomy_search_api_processor_info() {
+  $processors['search_api_taxonomy_heirarchy'] = array(
+    'name' => t('Taxonomy Heirarchy'),
+    'description' => t('This processor indexes the parents of taxonomy terms.'),
+    'class' => 'SearchApiTaxonomyHeirarchyProcessor',
+    'weight' => 30,
+  );
+
+  return $processors;
+}
+
+/**
+ * Implements hook_facetapi_widgets().
+ */
+function search_api_taxonomy_facetapi_widgets() {
+  return array(
+    'searchapitaxonomy_checkbox_links_top_level' => array(
+      'handler' => array(
+        'label' => t('Links with checkboxes - Top level only'),
+        'class' => 'SearchAPITaxonomyFacetapiWidgetCheckboxLinksTopLevel',
+        'query types' => array('term'),
+      ),
+    ),
+  );
+}

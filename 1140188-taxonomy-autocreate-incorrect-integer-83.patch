@@ -1,0 +1,156 @@
+diff --git a/modules/taxonomy/taxonomy.module b/modules/taxonomy/taxonomy.module
+index 7ad28e9..4390ed9 100644
+--- a/modules/taxonomy/taxonomy.module
++++ b/modules/taxonomy/taxonomy.module
+@@ -1720,8 +1720,17 @@ function taxonomy_term_title($term) {
+  */
+ function taxonomy_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+   $tags = array();
++  $autocreates = 0;
+   foreach ($items as $item) {
+-    $tags[$item['tid']] = isset($item['taxonomy_term']) ? $item['taxonomy_term'] : taxonomy_term_load($item['tid']);
++    if ($item['tid'] == 'autocreate') {
++      $tags["autocreate" . $autocreates++] = (object) $item;
++    }
++    elseif (isset($item['taxonomy_term'])) {
++      $tags[$item['tid']] = $item['taxonomy_term'];
++    }
++    else {
++      $tags[$item['tid']] = taxonomy_term_load($item['tid']);
++    }
+   }
+ 
+   $element += array(
+@@ -1880,11 +1889,9 @@ function taxonomy_rdf_mapping() {
+  */
+ 
+ /**
+- * Implements hook_field_presave().
+- *
+- * Create any new terms defined in a freetagging vocabulary.
++ * Create all autocreate terms and store their actual tids.
+  */
+-function taxonomy_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
++function _taxonomy_field_create_autocreate_terms(&$items) {
+   foreach ($items as $delta => $item) {
+     if ($item['tid'] == 'autocreate') {
+       $term = (object) $item;
+@@ -1896,6 +1903,28 @@ function taxonomy_field_presave($entity_type, $entity, $field, $instance, $langc
+ }
+ 
+ /**
++ * Implements hook_field_update().
++ *
++ * Create any new terms defined in a freetagging vocabulary.
++ * This needs to be done in update/insert because presave isn't
++ * run for instance default values.
++ */
++function taxonomy_field_update($entity_type, $entity, $field, $instance, $langcode, &$items) {
++  _taxonomy_field_create_autocreate_terms($items);
++}
++
++/**
++ * Implements hook_field_insert().
++ *
++ * Create any new terms defined in a freetagging vocabulary.
++ * This needs to be done in update/insert because presave isn't
++ * run for instance default values.
++ */
++function taxonomy_field_insert($entity_type, $entity, $field, $instance, $langcode, &$items) {
++  _taxonomy_field_create_autocreate_terms($items);
++}
++
++/**
+  * Implements hook_node_insert().
+  */
+ function taxonomy_node_insert($node) {
+diff --git a/modules/taxonomy/taxonomy.test b/modules/taxonomy/taxonomy.test
+index 665f9ae..a8fc9f0 100644
+--- a/modules/taxonomy/taxonomy.test
++++ b/modules/taxonomy/taxonomy.test
+@@ -1608,6 +1608,85 @@ class TaxonomyTermFieldTestCase extends TaxonomyWebTestCase {
+ }
+ 
+ /**
++ * Test the autocreate widget.
++ */
++class TaxonomyAutocompleteWidgetTestCase extends TaxonomyWebTestCase {
++  protected $instance;
++  protected $vocabulary;
++
++  public static function getInfo() {
++    return array(
++      'name' => 'Taxonomy autocomplete widget',
++      'description' => 'Test autocreating terms in various situations.',
++      'group' => 'Taxonomy',
++    );
++  }
++
++  function setUp() {
++    parent::setUp('field_test');
++
++    $web_user = $this->drupalCreateUser(array('access field_test content', 'administer field_test content', 'administer taxonomy'));
++    $this->drupalLogin($web_user);
++    $this->vocabulary = $this->createVocabulary();
++
++    // Setup a field and instance.
++    $this->field_name = drupal_strtolower($this->randomName());
++    $this->field = array(
++      'field_name' => $this->field_name,
++      'type' => 'taxonomy_term_reference',
++      'settings' => array(
++        'allowed_values' => array(
++          array(
++            'vocabulary' => $this->vocabulary->machine_name,
++            'parent' => '0',
++          ),
++        ),
++      )
++    );
++    field_create_field($this->field);
++    $this->instance = array(
++      'field_name' => $this->field_name,
++      'entity_type' => 'test_entity',
++      'bundle' => 'test_bundle',
++      'widget' => array(
++        'type' => 'taxonomy_autocomplete',
++        'module' => 'taxonomy',
++      ),
++      'display' => array(
++        'full' => array(
++          'type' => 'taxonomy_term_reference_link',
++        ),
++      ),
++      'default_value' => array(
++        array(
++          'tid' => 'autocreate',
++          'vid' => $this->vocabulary->vid,
++          'vocabulary_machinevname' => $this->vocabulary->name,
++          'name' => 'testterm',
++        ),
++      ),
++    );
++    field_create_instance($this->instance);
++  }
++
++  /**
++   * Test programmatic creation of entity with default values.
++   */
++  function testCreateEmptyEntity() {
++    $entity = (object) array('fttype' => 'test_bundle');
++    field_test_entity_save($entity);
++  }
++
++  /**
++   * Test creation of entity via form with default values.
++   */
++  function testCreateDefaultEntity() {
++    $this->drupalGet('test-entity/add/test-bundle');
++    $this->drupalPost(NULL, array(), t('Save'));
++  }
++}
++
++/**
+  * Tests a taxonomy term reference field that allows multiple vocabularies.
+  */
+ class TaxonomyTermFieldMultipleVocabularyTestCase extends TaxonomyWebTestCase {

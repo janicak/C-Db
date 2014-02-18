@@ -1,0 +1,6 @@
+name = Inline Entity Form Rendered
+description = An alternative Inline Entity Form field widget displaying rendered entities.
+package = Fields
+core = 7.x
+
+dependencies[] = inline_entity_form

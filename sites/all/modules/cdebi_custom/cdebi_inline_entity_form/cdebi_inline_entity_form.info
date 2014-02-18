@@ -1,0 +1,6 @@
+name = C-DEBI Inline Entity Form
+description = Improves display of inline entity form
+core = 7.x
+dependencies[] = inline_entity_form
+files[] = cdebi_inline_entity_form.module
+

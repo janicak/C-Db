@@ -1,0 +1,603 @@
+<?php
+
+/**
+ * @file
+ * Provides a widget for Inline Entity Form that displays the rendered entity
+ * based on the view_mode setting for that entity.
+ */
+
+/**
+* Implements hook_field_widget_info().
+*/
+function inline_entity_form_rendered_field_widget_info() {
+  $info['inline_entity_form_rendered'] = array(
+    'label' => t('Inline entity form - Rendered inline'),
+    'field types' => array('commerce_line_item_reference', 'commerce_product_reference', 'entityreference'),
+    'settings' => array(
+      'fields' => array(),
+      'type_settings' => array(),
+      'view_mode' => 'teaser',
+    ),
+    'weight' => 10,
+    'behaviors' => array(
+      'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+      'default value' => FIELD_BEHAVIOR_NONE,
+    ),
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function inline_entity_form_rendered_theme() {
+  return array(
+    'inline_entity_form_rendered_entity_table' => array(
+      'render element' => 'form',
+    ),
+  );
+}
+
+/**
+ * Introspects field and instance settings, and determines the correct settings
+ * for the functioning of the widget.
+ *
+ * Settings:
+ *   - entity_type - The entity_type being managed.
+ *   - bundles - Bundles of entities that the user is allowed to create.
+ *   - column - The name of the ref. field column that stores the entity id.
+ */
+function inline_entity_form_rendered_settings($field, $instance) {
+  return inline_entity_form_settings($field, $instance) + $instance['widget']['settings'];
+}
+
+
+/**
+ * Implements hook_field_widget_settings_form().
+ */
+function inline_entity_form_rendered_field_widget_settings_form($field, $instance) {
+  $settings = inline_entity_form_rendered_settings($field, $instance);
+  $element = inline_entity_form_field_widget_settings_form($field, $instance);
+
+  $info = entity_get_info($settings['entity_type']);
+  $element['view_mode'] = array(
+    '#type' => 'select',
+    '#title' => t('View mode for entity display in widget'),
+    '#options' => inline_entity_form_rendered_get_view_mode_options($settings['entity_type']),
+    '#default_value' => $settings['view_mode'],
+  );
+
+  // Remove the deprecated setting for deleting refereneced items.
+  if (isset($element['type_settings']['delete_references'])) {
+    $element['type_settings']['delete_references'] = array(
+      '#type' => 'value',
+      '#value' => 0,
+    );
+  }
+
+  return $element;
+}
+
+/**
+ * Helper function to get the view modes available for an entity_type.
+ *
+ * @param string $entity_type - The entity_type being managed.
+ */
+function inline_entity_form_rendered_get_view_mode_options($entity_type) {
+  $info = entity_get_info($entity_type);
+  $options = array();
+  foreach ($info['view modes'] as $key => $view_mode) {
+    $options[$key] = $view_mode['label'];
+  }
+  return $options;
+}
+
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function inline_entity_form_rendered_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $widget = $instance['widget'];
+  $settings = inline_entity_form_rendered_settings($field, $instance);
+  $entity_type = $settings['entity_type'];
+  $entity_info = entity_get_info($entity_type);
+  $cardinality = $field['cardinality'];
+  $controller = inline_entity_form_get_controller($instance);
+  // The current entity type is not supported, execution can't continue.
+  if (!$controller) {
+    return array();
+  }
+
+  // Get the entity type labels for the UI strings.
+  $labels = $controller->labels();
+
+  // Build a parents array for this element's values in the form.
+  $parents = array_merge($element['#field_parents'], array($element['#field_name'], $element['#language']));
+
+  // Get the langcode of the parent entity.
+  $parent_langcode = entity_language($element['#entity_type'], $element['#entity']);
+
+  if (!isset($form['#ief_id'])) {
+    $depth = 0;
+    $path = '';
+  }
+  else {
+    $path = $form['#ief_id'];
+    $path_parts = explode('--', $path);
+    $depth = count($path_parts);
+    $path = $path . '--';
+  }
+
+  // Edit operation; delta of ief provided.
+  if ($depth > 0 && isset($form['#ief_row_delta'])) {
+    $child_delta = $form['#ief_row_delta'];
+  }
+  // Add operation; determine delta for new form by counting parent's entities.
+  else if ($depth > 0 && !isset($form['#ief_row_delta'])) {
+    $child_delta = count($form_state['inline_entity_form'][$form['#ief_id']]['entities']);
+  }
+  // Initial value.
+  else {
+    $child_delta = 0;
+  }
+
+  // Assign a unique identifier to each IEF widget.
+  $ief_id = $path . $instance['id'] . '_' . $depth . '_' . $child_delta;
+
+  // Determine the wrapper ID for the entire element.
+  $wrapper = 'inline-entity-form-' . $ief_id;
+  $element = array(
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+    '#description' => NULL,
+    '#prefix' => '<div id="' . $wrapper . '">',
+    '#suffix' => '</div>',
+    '#attached' => array(
+      'css' => array(),
+    ),
+    '#ief_id' => $ief_id,
+    '#ief_root' => TRUE,
+  ) + $element;
+
+  if (module_exists('file')) {
+    // file.js triggers uploads when the main Submit button is clicked.
+    $element['#attached']['js'] = array(
+      drupal_get_path('module', 'file') . '/file.js',
+      drupal_get_path('module', 'inline_entity_form') . '/inline_entity_form.js',
+    );
+  }
+
+  $base_css = array(
+    'base' => drupal_get_path('module', 'inline_entity_form') . '/theme/inline_entity_form.css',
+    'seven' => drupal_get_path('module', 'inline_entity_form') . '/theme/inline_entity_form.seven.css',
+  );
+  // Add the base module CSS.
+  _inline_entity_form_attach_css($base_css, $element['#attached']['css']);
+
+  $rendered_css = array(
+    'base' => drupal_get_path('module', 'inline_entity_form_rendered') . '/theme/inline_entity_form_rendered.css',
+    'seven' => drupal_get_path('module', 'inline_entity_form_rendered') . '/theme/inline_entity_form_rendered.seven.css',
+  );
+  // Add the rendered module CSS.
+  _inline_entity_form_attach_css($rendered_css, $element['#attached']['css']);
+
+  // Add entity type specific CSS.
+  _inline_entity_form_attach_css($controller->css(), $element['#attached']['css']);
+
+  // Initialize the IEF array in form state.
+  if (empty($form_state['inline_entity_form'][$ief_id])) {
+    $form_state['inline_entity_form'][$ief_id] = array(
+      'form' => NULL,
+      'settings' => $settings,
+      'instance' => $instance,
+    );
+
+    // Load the entities from the $items array and store them in the form
+    // state for further manipulation.
+    $form_state['inline_entity_form'][$ief_id]['entities'] = array();
+    $entity_ids = array();
+    foreach ($items as $item_delta => $item) {
+      $entity_ids[$item_delta] = $item[$settings['column']];
+    }
+    $entities = entity_load($entity_type, $entity_ids);
+
+    foreach ($items as $item_delta => $item) {
+      $form_state['inline_entity_form'][$ief_id]['entities'][$item_delta] = array(
+        'entity' => $entities[$entity_ids[$item_delta]],
+        'weight' => $item_delta,
+        'form' => NULL,
+        'needs_save' => FALSE,
+      );
+    }
+  }
+
+  $element[$settings['column']] = array(
+    '#type' => 'value',
+    '#value' => !empty($items[$delta][$settings['column']]) ? $items[$delta][$settings['column']] : NULL,
+  );
+
+  if (!empty($form_state['inline_entity_form'][$ief_id]['entities'])) {
+    $element['entities'] = array(
+      '#tree' => TRUE,
+      '#theme' => 'inline_entity_form_rendered_entity_table',
+      '#entity_type' => $settings['entity_type'],
+    );
+
+    foreach ($form_state['inline_entity_form'][$ief_id]['entities'] as $key => $value) {
+      // Data used by theme_inline_entity_form_entity_table().
+      $element['entities'][$key]['#entity'] = $entity = $value['entity'];
+      $element['entities'][$key]['#needs_save'] = $value['needs_save'];
+
+      // Handle row weights.
+      $element['entities'][$key]['#weight'] = $value['weight'];
+
+      // Get the rendered entity.
+      $rendered = inline_entity_form_rendered_get_entity_output($entity_type, $entity, $settings['view_mode']);
+
+      // First check to see if this entity should be displayed as a form.
+      if (!empty($value['form'])) {
+        $element['entities'][$key]['delta'] = array(
+          '#type' => 'value',
+          '#value' => $value['weight'],
+        );
+        $element['entities'][$key]['form'] = array(
+          '#type' => 'container',
+          '#attributes' => array('class' => array('ief-form', 'ief-form-row')),
+          '#op' => $value['form'],
+          // Used by Field API and controller methods to find the relevant
+          // values in $form_state.
+          '#parents' => array_merge($parents, array('entities', $key, 'form')),
+          // Store the entity on the form, later modified in the controller.
+          '#entity' => $entity,
+          '#entity_type' => $settings['entity_type'],
+          // Pass the langcode of the parent entity,
+          '#parent_language' => $parent_langcode,
+          // Identifies the IEF widget to which the form belongs.
+          '#ief_id' => $ief_id,
+          // Identifies the table row to which the form belongs.
+          '#ief_row_delta' => $key,
+        );
+        // Prepare data for the form callbacks.
+        $form = &$element['entities'][$key]['form'];
+
+        // Add the rendered entity.
+        $element['entities'][$key]['entity']['output']['#markup'] = $rendered;
+
+        // Add the appropriate form.
+        if ($value['form'] == 'edit') {
+          $form += inline_entity_form_entity_form($controller, $form, $form_state);
+        }
+        elseif ($value['form'] == 'remove') {
+          $form += inline_entity_form_remove_form($controller, $form, $form_state);
+        }
+      }
+      else {
+        $row = &$element['entities'][$key];
+        $row['delta'] = array(
+          '#type' => 'weight',
+          '#delta' => 50,
+          '#default_value' => $value['weight'],
+          '#attributes' => array('class' => array('ief-entity-delta')),
+        );
+
+        $row['entity'] = array(
+          '#type' => 'container',
+          '#attributes' => array(
+            'style' => 'float:left; width: 80%;',
+          ),
+        );
+
+        // Add the rendered entity.
+        $element['entities'][$key]['entity']['output']['#markup'] = $rendered;
+
+        // Add an actions container with edit and delete buttons for the entity.
+        $row['actions'] = array(
+          '#type' => 'container',
+          '#attributes' => array('class' => array('ief-entity-operations')),
+        );
+
+        // Make sure entity_access is not checked for unsaved entities.
+        list($entity_id) = entity_extract_ids($controller->entityType(), $entity);
+        if (empty($entity_id) || entity_access('update', $controller->entityType(), $entity)) {
+          $row['actions']['ief_entity_edit'] = array(
+            '#type' => 'submit',
+            '#value' => t('Edit'),
+            '#name' => 'ief-' . $ief_id . '-entity-edit-' . $key,
+            '#limit_validation_errors' => array(),
+            '#ajax' => array(
+              'callback' => 'inline_entity_form_get_element',
+              'wrapper' => $wrapper,
+            ),
+            '#submit' => array('inline_entity_form_open_row_form'),
+            '#ief_row_delta' => $key,
+            '#ief_row_form' => 'edit',
+          );
+        }
+
+        // If 'allow_existing' is on, the default removal operation is unlink
+        // and the access check for deleting happens inside the controller
+        // removeForm() method.
+        if (empty($entity_id) || $controller->getSetting('allow_existing')
+          || entity_access('delete', $controller->entityType(), $entity)) {
+          $row['actions']['ief_entity_remove'] = array(
+            '#type' => 'submit',
+            '#value' => t('Remove'),
+            '#name' => 'ief-' . $ief_id . '-entity-remove-' . $key,
+            '#limit_validation_errors' => array(),
+            '#ajax' => array(
+              'callback' => 'inline_entity_form_get_element',
+              'wrapper' => $wrapper,
+            ),
+            '#submit' => array('inline_entity_form_open_row_form'),
+            '#ief_row_delta' => $key,
+            '#ief_row_form' => 'remove',
+          );
+        }
+      }
+    }
+  }
+
+  $entity_count = count($form_state['inline_entity_form'][$ief_id]['entities']);
+  if ($cardinality != FIELD_CARDINALITY_UNLIMITED) {
+    // Return visual cue of cardinality count.
+    $element['#description'] = t('You have added @entities_count out of @cardinality_count allowed @label.', array(
+      '@entities_count' => $entity_count,
+      '@cardinality_count' => $cardinality,
+      '@label' => $labels['plural'],
+    ));
+  }
+  // Do not return the rest of the form if cardinality count has been reached.
+  if ($cardinality > 0 && $entity_count == $cardinality) {
+    return $element;
+  }
+
+  // Try to open the add form (if it's the only allowed action, the
+  // field is required and empty, and there's only one allowed bundle).
+  if (empty($form_state['inline_entity_form'][$ief_id]['entities'])) {
+    if (count($settings['create_bundles']) == 1 && $instance['required'] && !$controller->getSetting('allow_existing')) {
+      $bundle = reset($settings['create_bundles']);
+
+      // The parent entity type and bundle must not be the same as the inline
+      // entity type and bundle, to prevent recursion.
+      if ($element['#entity_type'] != $settings['entity_type'] || $element['#bundle'] != $bundle) {
+        $form_state['inline_entity_form'][$ief_id]['form'] = 'add';
+        $form_state['inline_entity_form'][$ief_id]['form settings'] = array(
+          'bundle' => $bundle,
+        );
+      }
+    }
+  }
+
+  // If no form is open, show buttons that open one.
+  if (empty($form_state['inline_entity_form'][$ief_id]['form'])) {
+    $element['actions'] = array(
+      '#attributes' => array('class' => array('container-inline')),
+      '#type' => 'container',
+      '#weight' => 100,
+    );
+
+    // The user is allowed to create an entity of at least one bundle.
+    if (count($settings['create_bundles'])) {
+      // Let the user select the bundle, if multiple are available.
+      if (count($settings['create_bundles']) > 1) {
+        $bundles = array();
+        foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
+          if (in_array($bundle_name, $settings['create_bundles'])) {
+            $bundles[$bundle_name] = $bundle_info['label'];
+          }
+        }
+
+        $element['actions']['bundle'] = array(
+          '#type' => 'select',
+          '#options' => $bundles,
+        );
+      }
+      else {
+        $element['actions']['bundle'] = array(
+          '#type' => 'value',
+          '#value' => reset($settings['create_bundles']),
+        );
+      }
+
+      $element['actions']['ief_add'] = array(
+        '#type' => 'submit',
+        '#value' => t('Add new @type_singular', array('@type_singular' => $labels['singular'])),
+        '#name' => 'ief-' . $ief_id . '-add',
+        '#limit_validation_errors' => array(array_merge($parents, array('actions'))),
+        '#ajax' => array(
+          'callback' => 'inline_entity_form_get_element',
+          'wrapper' => $wrapper,
+        ),
+        '#submit' => array('inline_entity_form_open_form'),
+        '#ief_form' => 'add',
+      );
+    }
+
+    if ($controller->getSetting('allow_existing')) {
+      $element['actions']['ief_add_existing'] = array(
+        '#type' => 'submit',
+        '#value' => t('Add existing @type_singular', array('@type_singular' => $labels['singular'])),
+        '#name' => 'ief-' . $ief_id . '-add-existing',
+        '#limit_validation_errors' => array(array_merge($parents, array('actions'))),
+        '#ajax' => array(
+          'callback' => 'inline_entity_form_get_element',
+          'wrapper' => $wrapper,
+        ),
+        '#submit' => array('inline_entity_form_open_form'),
+        '#ief_form' => 'ief_add_existing',
+        '#access' => $controller->getSetting('allow_existing'),
+      );
+    }
+  }
+  else {
+    // There's a form open, show it.
+    $element['form'] = array(
+      '#type' => 'fieldset',
+      '#attributes' => array('class' => array('ief-form', 'ief-form-bottom')),
+      // Identifies the IEF widget to which the form belongs.
+      '#ief_id' => $ief_id,
+      // Used by Field API and controller methods to find the relevant
+      // values in $form_state.
+      '#parents' => array_merge($parents, array('form')),
+      // Pass the current entity type.
+      '#entity_type' => $settings['entity_type'],
+      // Pass the langcode of the parent entity,
+      '#parent_language' => $parent_langcode,
+    );
+
+    if ($form_state['inline_entity_form'][$ief_id]['form'] == 'add') {
+      $element['form']['#op'] = 'add';
+      $element['form'] += inline_entity_form_entity_form($controller, $element['form'], $form_state);
+
+      // Hide the cancel button if the reference field is required but
+      // contains no values. That way the user is forced to create an entity.
+      if (!$controller->getSetting('allow_existing') && $instance['required']
+        && empty($form_state['inline_entity_form'][$ief_id]['entities'])
+        && count($settings['create_bundles']) == 1) {
+        $element['form']['actions']['ief_add_cancel']['#access'] = FALSE;
+      }
+    }
+    elseif ($form_state['inline_entity_form'][$ief_id]['form'] == 'ief_add_existing') {
+      $element['form'] += inline_entity_form_reference_form($controller, $element['form'], $form_state);
+    }
+
+    // No entities have been added. Remove the outer fieldset to reduce
+    // visual noise caused by having two titles.
+    if (empty($form_state['inline_entity_form'][$ief_id]['entities'])) {
+      $element['#type'] = 'container';
+    }
+  }
+
+  // Required mark & validation.
+  // Drupal doesn't have required marker for fieldset.
+  if ($element['#required']) {
+    $element['#title'] .= ' ' . theme('form_required_marker', array('element' => $element));
+    $element['#element_validate'][] = 'inline_entity_form_required_field';
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_widget_error().
+ */
+function inline_entity_form_rendered_field_widget_error($element, $error) {
+  form_error($element, $error['message']);
+}
+
+/**
+ * Helper function to render the entity based on a view_mode.
+ *
+ * @param string $entity_type - The entity_type being managed.
+ * @param object $entity - The entity being managed.
+ * @param string $view_mode - The view_mode to render.
+ */
+function inline_entity_form_rendered_get_entity_output($entity_type, $entity, $view_mode) {
+  list($entity_id) = entity_extract_ids($entity_type, $entity);
+  $build = entity_view($entity_type, array($entity_id => $entity), $view_mode);
+  $build = reset($build[$entity_type]);
+  unset($build['links']);
+  unset($build['#contextual_links']);
+  $output = render($build);
+  //$output = '<h2>' . check_plain($label) . '</h2>' . $output;
+  $output = inline_entity_form_rendered_filter_out_links($output);
+  return $output;
+}
+
+/**
+ * Helper function to filter out links.
+ */
+function inline_entity_form_rendered_filter_out_links($text) {
+  return filter_xss($text, array('abbr', 'acronym', 'address', 'article', 'aside', 'b', 'bdi', 'bdo', 'big', 'blockquote', 'br', 'caption', 'cite', 'code', 'col', 'colgroup', 'command', 'dd', 'del', 'details', 'dfn', 'div', 'dl', 'dt', 'em', 'figcaption', 'figure', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'i', 'img', 'ins', 'kbd', 'li', 'mark', 'menu', 'meter', 'nav', 'ol', 'output', 'p', 'pre', 'progress', 'q', 'rp', 'rt', 'ruby', 's', 'samp', 'section', 'small', 'span', 'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'time', 'tr', 'tt', 'u', 'ul', 'var', 'wbr'));
+}
+
+/**
+ * Themes the table showing existing rendered entity references in the widget.
+ *
+ * @param $variables
+ *   Contains the form element data from $element['entities'].
+ */
+function theme_inline_entity_form_rendered_entity_table($variables) {
+  $form = $variables['form'];
+  $entity_type = $form['#entity_type'];
+  // If one of the rows is in form context, disable tabledrag.
+  $has_tabledrag = TRUE;
+  foreach (element_children($form) as $key) {
+    if (!empty($form[$key]['form'])) {
+      $has_tabledrag = FALSE;
+    }
+  }
+
+  $header = array();
+  if ($has_tabledrag) {
+    $header[] = array('data' => '', 'class' => array('ief-tabledrag-header'));
+    $header[] = array('data' => t('Sort order'), 'class' => array('ief-sort-order-header'));
+  }
+  // Add header column for the rendered entity.
+  $rendered_col = array(
+    'data' => '', // Lease the column header blank.
+    'class' => array('ief-first-column-header'),
+  );
+  $header[] = $rendered_col;
+  $header[] = t('Operations');
+
+  // Build an array of entity rows for the table.
+  $rows = array();
+  foreach (element_children($form) as $key) {
+    $entity = $form[$key]['#entity'];
+    list($entity_id) = entity_extract_ids($entity_type, $entity);
+    // Many field formatters (such as the ones for files and images) need
+    // certain data that might be missing on unsaved entities because the field
+    // load hooks haven't run yet. Because of that, those hooks are invoked
+    // explicitly. This is the same trick used by node_preview().
+    if ($form[$key]['#needs_save']) {
+      _field_invoke_multiple('load', $entity_type, array($entity_id => $entity));
+    }
+
+    $row_classes = array('ief-row-entity');
+    $cells = array();
+    if ($has_tabledrag) {
+      $cells[] = array('data' => '', 'class' => array('ief-tabledrag-handle'));
+      $cells[] = drupal_render($form[$key]['delta']);
+      $row_classes[] = 'draggable';
+    }
+    // Add a special class to rows that have a form underneath, to allow
+    // for additional styling.
+    if (!empty($form[$key]['form'])) {
+      $row_classes[] = 'ief-row-entity-form';
+    }
+
+    // Add the rendered entity.
+    $data = $form[$key]['entity']['output']['#markup'];
+    $cells[] = array('data' => $data, 'class' => array('inline-entity-form-' . $entity_type . '-rendered'));
+
+    // Add the buttons belonging to the "Operations" column.
+    $cells[] = drupal_render($form[$key]['actions']);
+    // Create the row.
+    $rows[] = array('data' => $cells, 'class' => $row_classes);
+
+    // If the current entity array specifies a form, output it in the next row.
+    if (!empty($form[$key]['form'])) {
+      $row = array(
+        array('data' => drupal_render($form[$key]['form']), 'colspan' => 2),
+      );
+      $rows[] = array('data' => $row, 'class' => array('ief-row-form'), 'no_striping' => TRUE);
+    }
+  }
+
+  if (!empty($rows)) {
+    $id = 'ief-entity-table-' . $form['#id'];
+    if ($has_tabledrag) {
+      // Add the tabledrag JavaScript.
+      drupal_add_tabledrag($id, 'order', 'sibling', 'ief-entity-delta');
+    }
+
+    // Return the themed table.
+    $table_attributes = array(
+      'id' => $id,
+      'class' => array('ief-entity-table'),
+    );
+    return theme('table', array('header' => $header, 'rows' => $rows, 'sticky' => FALSE, 'attributes' => $table_attributes));
+  }
+}

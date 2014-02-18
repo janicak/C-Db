@@ -1,0 +1,11 @@
+name = Biblio - Search API
+project = biblio_search_api
+description = Exposes the fields in the 'biblio' content type to search_api for indexing.
+package = Biblio
+version = 7.x-1.01
+core = 7.x
+project status url = http://systems.lib.unb.ca/updates
+
+dependencies[] = biblio
+dependencies[] = entity
+dependencies[] = search_api

@@ -1,0 +1,25 @@
+From 69f69b86bcb0e9b9a50251d92645d0ce373a4117 Mon Sep 17 00:00:00 2001
+From: capy <capy.net@gmail.com>
+Date: Sun, 24 Nov 2013 18:29:30 +0100
+Subject: [PATCH] Issue #1357402 Header declared as string instead array.
+
+---
+ includes/files.inc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/files.inc b/includes/files.inc
+index 33a793d..a93d70d 100644
+--- a/includes/files.inc
++++ b/includes/files.inc
+@@ -323,7 +323,7 @@ class backup_file {
+     // In some circumstances, web-servers will double compress gzipped files.
+     // This may help aleviate that issue by disabling mod-deflate.
+     if ($this->mimetype() == 'application/x-gzip') {
+-      $headers[] = 'Content-Encoding: gzip';
++      $headers[] = array('key' => 'Content-Encoding', 'value' => 'gzip');
+     }
+     if ($size = $this->info('filesize')) {
+       $headers[] = array('key' => 'Content-Length', 'value' => $size);
+-- 
+1.8.1.2
+

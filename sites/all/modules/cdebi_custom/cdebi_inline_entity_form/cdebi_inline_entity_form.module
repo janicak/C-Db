@@ -1,0 +1,12 @@
+<?php
+
+module_load_include('inc', 'cdebi_inline_entity_form', 'includes/NodeCustomController');
+
+/** Implements hook_entity_info_alter() **/
+function your_module_name_entity_info_alter(&$entity_info) {
+    $entity_info['node']['inline entity form'] = array(
+        'controller' => 'NodeCustomController',
+    );
+}
+
+?>

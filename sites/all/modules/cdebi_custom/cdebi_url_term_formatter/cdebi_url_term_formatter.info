@@ -1,0 +1,6 @@
+name = C-DEBI URL Term Formatter
+description = Provides C-DEBI URL term formatters for taxonomy reference fields.
+core = 7.x
+dependencies[] = taxonomy
+files[] = cdebi_url_term_formatter.module
+

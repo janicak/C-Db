@@ -1,0 +1,11 @@
+name = "C-DEBI Chosen Facets"
+description = "Integrate Chosen library with Facet API Multiselect"
+core = 7.x
+package = "C-DEBI"
+
+dependencies[] = facetapi_multiselect
+dependencies[] = libraries
+
+files[] = chosen_facet.module
+
+scripts[] = js/chosen_facet.js

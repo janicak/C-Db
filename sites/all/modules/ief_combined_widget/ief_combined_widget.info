@@ -1,0 +1,5 @@
+name = IEF Combined Widget
+description = "Provides an autocomplete widget for the Inline Entity Form module "
+package = Repair Central
+dependencies[] = inline_entity_form
+core = 7.x

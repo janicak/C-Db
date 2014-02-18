@@ -1,0 +1,12 @@
+name = Token preview
+description = "Adds a preview column to every 'Replacement patterns' table for token."
+core = 7.x
+
+dependencies[] = token
+
+; Information added by Drupal.org packaging script on 2013-12-28
+version = "7.x-1.0-beta1"
+core = "7.x"
+project = "tokenpreview"
+datestamp = "1388254114"
+

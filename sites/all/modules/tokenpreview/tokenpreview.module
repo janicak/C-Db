@@ -1,0 +1,78 @@
+<?php
+
+/**
+ * Implements hook_preprocess_tree_table()
+ *
+ * theme_tree_table() is defined in token.pages.inc in token module.
+ * The preprocess is to make this more useful.
+ *
+ * @param array $variables
+ */
+function tokenpreview_preprocess_tree_table(&$variables) {
+  $header_desc = array_pop($variables['header']);
+  $variables['header'][] = t('Value');
+  $variables['header'][] = $header_desc;
+  $token_groups = array();
+  $type = 0;
+  $typelength = 0;
+  $value_row_ids = array();
+  foreach ($variables['rows'] as $i => &$row) {
+    $desc_cell = $row['data']['description'];
+    unset($row['data']['description']);
+    $token_cell = $row['data']['token'];
+    if (is_array($token_cell) && !empty($token_cell['data'])) {
+      $token = $token_cell['data'];
+      if ('[' . $type . ':' === substr($token, 0, $typelength)) {
+        $key = substr($token, $typelength, -1);
+        $token_groups[$type][$key] = $token;
+        $value_row_ids[$type][$token] = $i;
+      }
+    }
+    else {
+      if ('token-' === substr($row['id'], 0, 6)) {
+        $type = substr($row['id'], 6);
+        $typelength = strlen($type) + 2;
+      }
+    }
+    $row['data']['value'] = '';
+    $row['data']['description'] = $desc_cell;
+  }
+
+  $node = node_load(5);
+  $data = array(
+    'node' => $node
+  );
+  $options = array(
+    'language' => $GLOBALS['language'],
+    'callback' => '_tokenpreview_clean_token_values',
+  );
+  foreach ($token_groups as $type => $tokens) {
+    $replacements = token_generate($type, $tokens, $data, $options);
+    foreach ($replacements as $token => $replacement) {
+      $i = $value_row_ids[$type][$token];
+      $variables['rows'][$i]['data']['value'] = $replacement;
+    }
+  }
+}
+
+/**
+ * Clean tokens so they are URL friendly.
+ *
+ * Taken directly from pathauto_clean_token_values()
+ *
+ * @param $replacements
+ *   An array of token replacements that need to be "cleaned" for use in the URL.
+ * @param $data
+ *   An array of objects used to generate the replacements.
+ * @param $options
+ *   An array of options used to generate the replacements.
+ */
+function _tokenpreview_clean_token_values(&$replacements, $data = array(), $options = array()) {
+  foreach ($replacements as $token => &$value) {
+    // Only clean non-path tokens.
+    if (!preg_match('/(path|alias|url|url-brief)\]$/', $token)) {
+      // We use a simple regex instead of pathauto_cleanstring().
+      $value = preg_replace('#[^a-z0-9/]+#', '-', strtolower($value));
+    }
+  }
+}

@@ -1,0 +1,13 @@
+diff --git a/entity_token.tokens.inc b/entity_token.tokens.inc
+index f9ec7f7..5eb1e8f 100644
+--- a/entity_token.tokens.inc
++++ b/entity_token.tokens.inc
+@@ -294,7 +294,7 @@ function _entity_token_wrap_data($token_type, $type, $data, $options) {
+  */
+ function _entity_token_get_token($wrapper, $options) {
+ 
+-  if ($wrapper->value() === NULL) {
++  if (!is_object($wrapper) || $wrapper->value() === NULL) {
+     // Do not provide a replacement if there is no value.
+     return NULL;
+   }
