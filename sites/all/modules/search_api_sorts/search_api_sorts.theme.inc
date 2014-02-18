@@ -25,6 +25,7 @@ function theme_search_api_sorts_list(array $variables) {
  *   - options: An array of options to pass to l().
  *   - active: A boolean telling whether this sort filter is active or not.
  *   - order_options: If active, a set of options to reverse the order
+ * @return string
  */
 function theme_search_api_sorts_sort(array $variables) {
   $name = $variables['name'];
@@ -32,13 +33,12 @@ function theme_search_api_sorts_sort(array $variables) {
   $options = $variables['options'] + array('attributes' => array());
   $options['attributes'] += array('class' => array());
 
-  $order_options = $variables['order_options'] + array('query' => array(), 'attributes' => array());
+  $order_options = $variables['order_options'] + array('query' => array(), 'attributes' => array(), 'html' => TRUE);
   $order_options['attributes'] += array('class' => array());
 
   if ($variables['active']) {
     $return_html = '<span class="search-api-sort-active">';
-    $return_html .= l(t($name), $path, $order_options) . ' ';
-    $return_html .= l(theme('tablesort_indicator', array('style' => $order_options['query']['order'])), $path, $order_options + array('html'=>TRUE));
+    $return_html .= l(t($name) . theme('tablesort_indicator', array('style' => $order_options['query']['order'])), $path, $order_options);
     $return_html .= '</span>';
   }
   else {

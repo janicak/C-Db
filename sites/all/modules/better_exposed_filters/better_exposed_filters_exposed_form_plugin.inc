@@ -594,6 +594,10 @@ Title Desc|Z -> A</pre> Leave the replacement value blank to remove an option al
     // Grab BEF settings.
     $settings = $this->_bef_get_settings();
 
+    // Allow modules/themes to alter BEF settings before they are passed to the
+    // exposed form widgets.
+    drupal_alter('better_exposed_filters_settings', $settings);
+
     // Some elements may be placed in a secondary fieldset (eg: "Advanced
     // search options"). Place this after the exposed filters and before the
     // rest of the items in the exposed form.
@@ -601,8 +605,12 @@ Title Desc|Z -> A</pre> Leave the replacement value blank to remove an option al
       // If one of the secondary widgets has exposed input, do not collapse
       // the secondary fieldset.
       $secondary_collapse = TRUE;
-      foreach ($this->view->get_exposed_input() as $key => $value) {
-        if (!empty($value) && isset($settings[$key]['more_options']['is_secondary'])) {
+      $exposed_input = $this->view->get_exposed_input();
+      foreach ($this->display->handler->get_handlers('filter') as $label => $filter) {
+        if (!$filter->options['exposed']) {
+          continue;
+        }
+        if (!empty($exposed_input[$filter->options['expose']['identifier']]) && $settings[$label]['more_options']['is_secondary']) {
           $secondary_collapse = FALSE;
           break;
         }

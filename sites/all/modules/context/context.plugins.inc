@@ -7,9 +7,14 @@ function _context_context_registry() {
   $registry = array();
   $registry['conditions'] = array(
     'context' => array(
-      'title' => t('Context'),
-      'description' => t('Set this context on the basis of other active contexts. Put each context on a separate line. You can use the <code>*</code> character (asterisk) as a wildcard and the <code>~</code> character (tilde) to prevent this context from activating if the listed context is active. Other contexts which use context conditions can not be used to exclude this context from activating.'),
+      'title' => t('Context (any)'),
+      'description' => t('Set this context on the basis of other active contexts. Put each context on a separate line. The condition will pass if <em>any</em> of the contexts are active. You can use the <code>*</code> character (asterisk) as a wildcard and the <code>~</code> character (tilde) to prevent this context from activating if the listed context is active. Other contexts which use context conditions can not be used to exclude this context from activating.'),
       'plugin' => 'context_condition_context',
+    ),
+    'context_all' => array(
+      'title' => t('Context (all)'),
+      'description' => t('Set this context on the basis of other active contexts. Put each context on a separate line. The condition will pass only if <em>all</em> of the contexts are active. You can use the <code>*</code> character (asterisk) as a wildcard and the <code>~</code> character (tilde) to prevent this context from activating if the listed context is active. Other contexts which use context conditions can not be used to exclude this context from activating.'),
+      'plugin' => 'context_condition_context_all',
     ),
     'node' => array(
       'title' => t('Node type'),
@@ -103,6 +108,11 @@ function _context_context_registry() {
       'description' => t('Set the breadcrumb trail to the selected menu item.'),
       'plugin' => 'context_reaction_breadcrumb',
     ),
+    'template_suggestions' => array(
+      'title' => t('Template suggestions'),
+      'description' => t('Add template suggestions using context.'),
+      'plugin' => 'context_reaction_template_suggestions',
+    ),
     'theme' => array(
       'title' => t('Theme Page'),
       'description' => t('Control page theme variables using context.'),
@@ -157,6 +167,14 @@ function _context_context_plugins() {
       'path' => drupal_get_path('module', 'context') . '/plugins',
       'file' => 'context_condition_context.inc',
       'class' => 'context_condition_context',
+      'parent' => 'context_condition_path',
+    ),
+  );
+  $plugins['context_condition_context_all'] = array(
+    'handler' => array(
+      'path' => drupal_get_path('module', 'context') . '/plugins',
+      'file' => 'context_condition_context_all.inc',
+      'class' => 'context_condition_context_all',
       'parent' => 'context_condition_path',
     ),
   );
@@ -305,6 +323,14 @@ function _context_context_plugins() {
       'file' => 'context_reaction_breadcrumb.inc',
       'class' => 'context_reaction_breadcrumb',
       'parent' => 'context_reaction_menu',
+    ),
+  );
+  $plugins['context_reaction_template_suggestions'] = array(
+    'handler' => array(
+      'path' => drupal_get_path('module', 'context') . '/plugins',
+      'file' => 'context_reaction_template_suggestions.inc',
+      'class' => 'context_reaction_template_suggestions',
+      'parent' => 'context_reaction',
     ),
   );
   $plugins['context_reaction_menu'] = array(

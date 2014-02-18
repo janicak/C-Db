@@ -322,6 +322,9 @@ function context_context_page_condition() {
   if ($plugin = context_get_plugin('condition', 'context')) {
     $plugin->execute();
   }
+  if ($plugin = context_get_plugin('condition', 'context_all')) {
+    $plugin->execute();
+  }
 }
 
 /**
@@ -347,6 +350,9 @@ function context_preprocess_page(&$vars) {
     $plugin->execute($vars);
   }
   if ($plugin = context_get_plugin('reaction', 'theme')) {
+    $plugin->execute($vars);
+  }
+  if ($plugin = context_get_plugin('reaction', 'template_suggestions')) {
     $plugin->execute($vars);
   }
   /*
