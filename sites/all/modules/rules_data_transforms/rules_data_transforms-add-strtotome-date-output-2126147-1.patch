@@ -1,0 +1,32 @@
+diff --git a/rules_data_transforms.rules.inc b/rules_data_transforms.rules.inc
+index 16b4060..1da9faa 100755
+--- a/rules_data_transforms.rules.inc
++++ b/rules_data_transforms.rules.inc
+@@ -95,6 +95,16 @@ function rules_data_transforms_rules_action_info() {
+         ),
+       ),
+     ) + $defaults,
++    'strtotime_date' => array(
++      'label' => t('String to time (date output)'),
++      'base' => 'rules_data_transforms_action_strtotime',
++      'provides' => array(
++        'parsed_date' => array(
++          'type' => 'date',
++          'label' => t('Date'),
++        ),
++      ),
++    ) + $defaults,
+     'implode' => array(
+       'label' => t('Combine list into string'),
+       'base' => 'rules_data_transforms_action_implode',
+@@ -336,6 +346,10 @@ function rules_data_transforms_action_strtotime($input_text) {
+   return array('parsed_date' => strtotime($input_text));
+ }
+ 
++function rules_data_transforms_action_strtotime_date($input_text) {
++  return array('parsed_date' => strtotime($input_text));
++}
++
+ function rules_data_transforms_action_implode($input_list, $glue) {
+   if (is_array($input_list)) {
+     return array('combined_text' => implode($glue, $input_list));
