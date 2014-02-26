@@ -56,46 +56,29 @@ Drupal.behaviors.cdebiBootstrapBehaviors = {
         //jQuery TreeView
         $('#facetapi-facet-search-apipublications-index-block-field-locationsparents-all, #facetapi-facet-search-apipublications-index-block-field-programs-and-eventsfield-program-or-eventparents-all, #facetapi-facet-search-apipublications-index-block-field-methods-and-toolsfield-method-or-toolparents-all, #facetapi-facet-search-apidatasets-index-block-field-programs-and-eventsfield-program-or-eventparents-all, #facetapi-facet-search-apidatasets-index-block-field-methods-and-toolsfield-method-or-toolparents-all, #facetapi-facet-search-apidatasets-index-block-field-locationsparents-all, #facetapi-facet-search-apidatasets-index-block-field-locationsparents-all, #facetapi-facet-search-apidatasets-index-block-field-data-typeparents-all')
         .each( function(index, element) {
-          if (!$(this).hasClass("treeview")) {
-            var first = $(this).children("li:first-child");
-            var siblings = first.siblings().val();
-            if (siblings == '') {
-              $(this).treeview({
-                collapsed: true,
-                unique: false,
-                persist: "location",
-              });
-            } else {
-              $(this).treeview({
-                collapsed: false,
-                unique: false,
-                persist: "location",
-              });
-            }
+          var first = $(this).children("li:first-child");
+          var siblings = first.siblings().val();
+          if (siblings == '') {
+            $(this).treeview({
+              collapsed: true,
+              unique: false,
+              persist: "location",
+            });
+          } else {
+            $(this).treeview({
+              collapsed: false,
+              unique: false,
+              persist: "location",
+            });
           }
         });
 
         
-        /**Add Bootstrap table classes to views tables
+        //Add Bootstrap table classes to views tables
         $('#block-system-main table.views-table').addClass('table-curved');
         $('#block-system-main table.views-table table').addClass('table-condensed');
-        $('#cboxContent table.views-table').addClass('table-condensed');**/
+        $('#cboxContent table.views-table').addClass('table-condensed');
         $('#block-system-main button.btn-info').toggleClass('btn-info').addClass('btn-primary');
-        $('.views-table').toggleClass('table-bordered table-striped').addClass('table-condensed table');
-        $('.tab-content .check-empty').each( function(index, element) {
-          var id = $(this).attr("id");
-          var empty = $(this).children().children();
-          if (empty.length === 0) {
-            $("a[href=#" + id + "]").parent("li").remove();
-          }
-        });
-        $('.tab-content .check-empty-files').each( function(index, element) {
-          var id = $(this).attr("id");
-          var empty = $(this).children().children().children().text().match(/^[a-zA-Z0-9]+/);
-          if (empty === null) {
-            $("a[href=#" + id + "]").parent("li").remove();
-          }
-        });
 
         //Add Bootstrap classes to main menu nav
         $('#block-system-main-menu > ul').addClass('nav-pills');

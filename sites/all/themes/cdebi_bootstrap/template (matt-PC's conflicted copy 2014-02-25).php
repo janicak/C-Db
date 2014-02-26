@@ -191,12 +191,11 @@ function cdebi_bootstrap_facetapi_link_active($variables) {
 }
 
 // FACET API BONUS: Rewrite Facets: Rewrite programs and events w search name
-/**function cdebi_bootstrap_facet_items_alter(&$build, &$settings) {
+function cdebi_bootstrap_facet_items_alter(&$build, &$settings) {
   if ($settings->facet == "field_programs_and_events:field_program_or_event:parents_all") {
     foreach($build as $key => $item) {
       $build[$key]["#markup"] = drupal_strtoupper($item["#markup"]);
       print sdpm($build[$key]['#item_children']);
-    } 
-    
+    }
   }
-}**/
+}
