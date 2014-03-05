@@ -76,33 +76,60 @@ Drupal.behaviors.cdebiBootstrapBehaviors = {
         });
 
         
-        /**Add Bootstrap table classes to views tables
-        $('#block-system-main table.views-table').addClass('table-curved');
-        $('#block-system-main table.views-table table').addClass('table-condensed');
-        $('#cboxContent table.views-table').addClass('table-condensed');**/
-        $('#block-system-main button.btn-info').toggleClass('btn-info').addClass('btn-primary');
-        $('.views-table').toggleClass('table-bordered table-striped').addClass('table-condensed table');
-        $('.tab-content .check-empty').each( function(index, element) {
-          var id = $(this).attr("id");
-          var empty = $(this).children().children();
-          if (empty.length === 0) {
-            $("a[href=#" + id + "]").parent("li").remove();
+        //Add Bootstrap table classes to views tables
+        //.match(/^[a-zA-Z0-9]+/)
+        $('.view-datasets-index table.views-table').addClass('table-curved');
+        $('#block-system-main button.btn-info').removeClass('btn-info').addClass('btn-primary');
+        $('.view-publications .views-table').removeClass('table-bordered table-striped').addClass('table-condensed table');
+        $('.panel-collapse.abstract-panel').each( function(index, element) {
+          var children = $(this).children('div.panel-body').children();
+          if (children.length === 0) {
+            $(this).parents('div.panel-default').empty();
           }
         });
-        $('.tab-content .check-empty-files').each( function(index, element) {
-          var id = $(this).attr("id");
-          var empty = $(this).children().children().children().text().match(/^[a-zA-Z0-9]+/);
-          if (empty === null) {
-            $("a[href=#" + id + "]").parent("li").remove();
+        $('.panel-collapse.meta-panel').each( function(index, element) {
+          var children = $(this).children('div.panel-body').children().children();
+          if (children.length === 0) {
+            $(this).parents('div.panel-default').empty();
           }
+        });        
+        $('.panel-collapse.files-panel').each( function(index, element) {
+          var childfiles = $(this).children('table');
+          var childimages = $(this).children('.view-content div').children();
+          var children = childfiles.length + childimages.length;
+          if (children === 2) {
+            $(this).parents('div.panel-default').empty();
+          }
+        }); 
+        $('.panel-default').each (function(index, element) {
+          var children = $(this).children();
+          if (children.length === 0) {
+            $(this).remove();
+          }
+        });
+
+        //Abbreviated author list for publication result search header
+        $('.views-field-biblio-authors span').each (function(index, element){
+          var authors = $(this).text().split('; ');
+          if (authors.length > 2){
+            $(this).html(authors[0] + " <em>et al.</em>");
+          } else if (authors.length == 2) {
+            $(this).html(authors[0] + " & " + authors[1]);
+          } else if (authors.length == 1) {
+            $(this).html(authors[0]);
+          }
+
         });
 
         //Add Bootstrap classes to main menu nav
         $('#block-system-main-menu > ul').addClass('nav-pills');
 
         //Add Filter label above facets, results label above results
-        $('div.region-sidebar-first section.block-facetapi:first-child').before('<label>Filter</label>');
-        $('.page-publications #block-system-main div.view-content table:first-child, .page-datasets #block-system-main div.view-content table:first-child').before('<label>Results</label>');
+        $('div.region-sidebar-first section.block-facetapi:first-child').before('<label class="lead">Filter</label>');
+        //$('.page-publications #block-system-main .view-publications-index > div.view-content, .page-datasets #block-system-main div.view-content table:first-child').before('<label class="lead">Results</label>');
+        $('div.view-header').addClass('lead').insertAfter('.view-filters');
+        $('label[for=edit-fulltext]').addClass('lead').css('font-weight', '200');
+        $('label[for=edit-sort-bef-combine]').addClass('lead').css('font-weight', '200');
 
         //Replace data type taxonomy paths with search queries on dataset searches
         $('div.view-datasets-content- .views-field-field-data-type-1 a').each ( function(index, element) {

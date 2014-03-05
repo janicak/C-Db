@@ -93,7 +93,7 @@ class entity_views_handler_field_text extends views_handler_field {
    * Render a single field value.
    */
   public function render_single_value($value, $values) {
-    return $this->sanitize_value($value, 'xss');
+    return $this->sanitize_value($value, 'xss_admin');
   }
 
 }

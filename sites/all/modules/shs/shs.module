@@ -341,7 +341,13 @@ function shs_field_widget_afterbuild($element, &$form_state) {
   // Create Javascript settings for the element only if it hasn't been added
   // before.
   if (empty($js_added[$element['#name']][$js_hash])) {
-    $element_value = $element['#default_value']['tid'];
+    if (isset($element['#default_value']['tid'])) {
+      $element_value = $element['#default_value']['tid'];
+    }
+    else if (isset($element['#default_value'])){
+      $element_value = $element['#default_value']; }
+    else { $element_value = ""; 
+    }
 
     if (empty($element_value)) {
       // Add fake parent for new items.

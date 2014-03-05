@@ -105,30 +105,27 @@ display: block !important;
 
 
 /** FACETS **/
-.panel {
+.region-sidebar-first .panel {
 	border: 0px !important;
 }
-.panel-default > .panel-heading {
+.region-sidebar-first .panel-default > .panel-heading {
 	background-color: #b2dba2 !important;
-	font-weight: bold;
+	font-weight: 500;
 }
 .region-sidebar-first .panel {
 	margin-bottom: 12px;
 }
-.panel-heading {
+.region-sidebar-first .panel-heading {
 	border: 0px !important;
 }
-.panel > .list-group .list-group-item {
+.region-sidebar-first .panel > .list-group .list-group-item {
 	width:100% !important;
 }
-.panel > .list-group .list-group-item:first-child {
+.region-sidebar-first .panel > .list-group .list-group-item:first-child {
 	border-top: 0px;
 }
-.panel > .list-group .collapsable {
+.region-sidebar-first .panel > .list-group .collapsable {
 	max-width: 95% !important;
-}
-.facetapi-facetapi-links a {
-	font-weight:bold !important;
 }
 .treeview {
 	margin-top: 15px !important;
@@ -202,10 +199,16 @@ a.facetapi-inactive span.badge {
 	width: auto !important;
 	display: table-cell;
 	margin-top: 25px;
+}
+.views-reset-button {
 	padding-left: 8px !important;
 }
 .views-exposed-widget button {
     margin-top: 0px !important;
+}
+#edit-sort-bef-combine-wrapper {
+	min-width: 140px;
+	padding-left: 20px !important;
 }
 
 
@@ -216,21 +219,21 @@ a.facetapi-inactive span.badge {
 
 
 
-/** VIEW TABLES 
-table.views-table {
+/** VIEW TABLES **/
+.view-datasets-index table.views-table {
 	background-color: #ffffff;
 	width: 100%;
 }
-#block-system-main table.views-table > thead > tr > th {
+.view-datasets-index table.views-table > thead > tr > th {
 	background-color: #b2dba2;
 }
-table.views-table  > tbody > tr > td,
-table.views-table  > thead > tr > th {
+.view-datasets-index table.views-table  > tbody > tr > td,
+.view-datasets-index table.views-table  > thead > tr > th {
 	padding: 10px 15px !important;
 }
-table.views-table > thead > tr > th {
+.view-datasets-index table.views-table > thead > tr > th {
     border-bottom: 1px !important;
-}**/
+}
 .table-curved {
     border-collapse: separate;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
@@ -444,11 +447,12 @@ table.views-table table th {
 .view-display-id-page_1 ul.nav {
 	margin-bottom: 0px;
 }
-.view-display-id-page_1 .tab-content {
+.view-display-id-page_1 .result {
 	background-color: #FFFFFF;
 	border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
     border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
     padding: 20px 25px;
     margin-bottom: 12px;
     border-style: solid;
@@ -456,8 +460,59 @@ table.views-table table th {
     border-left-width: 1px;
     border-right-width: 1px;
     border-bottom-width: 1px;
-    border-top-width: 0px;
+    border-top-width: 1px;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);  
+    display: inline-block;
+    width: 100%;
+}
+.view-display-id-page_1 .tab-content > .active {
+    clear: both;
+    display: inline-block;
+    float: left;
+    margin-top: 14px;
+}
+.view-display-id-page_1 .panel-group {
+	clear: both;
+    display: inline-block;
+    float: left;
+    width: 100%;
+}
+
+.view-display-id-page_1 .nav a {
+	background-color: #EEEEEE;
+}
+.view-display-id-page_1 .nav-pills {
+	display: inline-block;
+	clear: left;
+	float: left;
+}
+.view-display-id-page_1 .views-field-biblio-date,
+.view-display-id-page_1 .view-id-publications,
+.view-display-id-page_1 .views-field-search-api-excerpt,
+.view-display-id-page_1 .tab-header,
+.view-display-id-page_1 .abstract {
+	display: inline-block;
+	margin-bottom: 14px;
+	clear: left;
+	float: left;
+}
+.view-display-id-page_1 .views-field-biblio-other-number {
+	display: inline-block;
+	float: right;
+}
+.view-display-id-page_1 .tab-header .view {
+	margin-bottom: 0px !important;
+}
+.view-display-id-page_1 .table-condensed tr:first-child > th,
+.view-display-id-page_1 .table-condensed tr:first-child > td {
+	border-top-width: 0px;
+}
+.view-display-id-page_1 .table-condensed {
+	margin-bottom: 0px !important;
+}
+.view-display-id-page_1 .abstract {
+	font-size: 16px;
+	line-height: 27px;
 }
 /**.view-display-id-page_1 .nav-tabs > li > a,
 .view-display-id-page_1 .nav-tabs > li.active.open > a,
