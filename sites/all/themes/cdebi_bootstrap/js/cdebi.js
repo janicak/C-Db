@@ -47,11 +47,11 @@ Drupal.behaviors.cdebiBootstrapBehaviors = {
         // Apply button classes to view mode modal link
         $('div.field-name-view-details > div > div').addClass('btn btn-xs btn-success');
 
-        // Apply button classes to edit link
+        /** Apply button classes to edit link
         $('.views-field-view-node a.colorbox-node').addClass('btn btn-xs btn-default').attr("rel", "cbox");
         $('.views-field-view-node a:last-child').addClass('btn btn-xs btn-primary');
         $('.views-field-field-urls a').addClass('btn btn-xs btn-primary');
-        $('.views-field-edit-node a').addClass('btn btn-xs btn-default');
+        $('.views-field-edit-node a').addClass('btn btn-xs btn-default');**/
 
         //jQuery TreeView
         $('#facetapi-facet-search-apipublications-index-block-field-locationsparents-all, #facetapi-facet-search-apipublications-index-block-field-programs-and-eventsfield-program-or-eventparents-all, #facetapi-facet-search-apipublications-index-block-field-methods-and-toolsfield-method-or-toolparents-all, #facetapi-facet-search-apidatasets-index-block-field-programs-and-eventsfield-program-or-eventparents-all, #facetapi-facet-search-apidatasets-index-block-field-methods-and-toolsfield-method-or-toolparents-all, #facetapi-facet-search-apidatasets-index-block-field-locationsparents-all, #facetapi-facet-search-apidatasets-index-block-field-locationsparents-all, #facetapi-facet-search-apidatasets-index-block-field-data-typeparents-all')
@@ -170,7 +170,6 @@ Drupal.behaviors.cdebiBootstrapBehaviors = {
         
         
 
-        
 
   	});
 

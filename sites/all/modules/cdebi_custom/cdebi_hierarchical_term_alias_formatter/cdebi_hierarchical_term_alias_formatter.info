@@ -1,0 +1,6 @@
+name = C-DEBI Hierarchical Term Formatter
+description = Provides C-DEBI hierarchical term alias formatters for taxonomy reference fields.
+core = 7.x
+dependencies[] = taxonomy
+files[] = cdebi_hierarchical_term_alias_formatter.module
+

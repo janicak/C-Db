@@ -19,6 +19,7 @@ stylesheets[all][] = css/style.css
 stylesheets[all][] = js/jquery-treeview/jquery.treeview.css
 stylesheets[all][] = js/custom-scrollbar-plugin/jquery.mCustomScrollbar.css
 stylesheets[all][] = js/yamm3/yamm/yamm.css
+;stylesheets[all][] = css/DT_bootstrap.css
 
 **********************************
  METHOD 1: Bootstrap Source Files
@@ -32,6 +33,7 @@ stylesheets[all][] = js/yamm3/yamm/yamm.css
  ;scripts[] = 'js/jquery-mousewheel/jquery.mousewheel.js'
  scripts[] = 'js/custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js'
  scripts[] = 'js/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js'
+ ;scripts[] = 'js/DT_bootstrap.js'
  ; Settings inherited by base theme, uncomment to override.
  ; settings[toggle_name] = 0
  ; settings[toggle_search] = 1
