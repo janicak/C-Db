@@ -78,7 +78,7 @@ Drupal.behaviors.cdebiBootstrapBehaviors = {
         
         //Add Bootstrap table classes to views tables
         //.match(/^[a-zA-Z0-9]+/)
-        $('.view-datasets-index table.views-table').addClass('table-curved');
+        $('.view-datasets-index table.views-table').addClass('table-bordered table-striped');
         $('#block-system-main button.btn-info').removeClass('btn-info').addClass('btn-primary');
         $('.view-publications .views-table').removeClass('table-bordered table-striped').addClass('table-condensed table');
         $('.panel-collapse.abstract-panel').each( function(index, element) {
@@ -97,7 +97,7 @@ Drupal.behaviors.cdebiBootstrapBehaviors = {
           var childfiles = $(this).children('table');
           var childimages = $(this).children('.view-content div').children();
           var children = childfiles.length + childimages.length;
-          if (children === 2) {
+          if (children === 1) {
             $(this).parents('div.panel-default').empty();
           }
         }); 
