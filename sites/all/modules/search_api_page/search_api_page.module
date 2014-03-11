@@ -135,7 +135,7 @@ function search_api_page_block_info() {
  */
 function search_api_page_block_view($delta) {
   $page = search_api_page_load($delta);
-  if ($page) {
+  if ($page && $page->enabled) {
     $block = array();
     $block['subject'] = t($page->name);
     $block['content'] = drupal_get_form('search_api_page_search_form_' . $page->machine_name, $page, NULL, TRUE);

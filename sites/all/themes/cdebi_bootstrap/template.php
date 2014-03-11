@@ -189,6 +189,11 @@ function cdebi_bootstrap_facetapi_link_active($variables) {
   $variables['options']['html'] = TRUE;
   return theme_link($variables) . '<span class="activefacet-text">' . $link_text . '</span>';
 }
+ 
+
+
+
+
 
 // FACET API BONUS: Rewrite Facets: Rewrite programs and events w search name
 /**function cdebi_bootstrap_facet_items_alter(&$build, &$settings) {
@@ -200,3 +205,8 @@ function cdebi_bootstrap_facetapi_link_active($variables) {
     
   }
 }**/
+
+// VIEWS QUERY ALTER TO GET ALL CHILDREN, SUB CHILDREN OF TAXONOMY TERM
+
+
+

@@ -106,6 +106,9 @@ function search_api_page_view($id, $keys = NULL) {
  *
  * @return array
  *   The search results as returned by SearchApiQueryInterface::execute().
+ *
+ * @throws SearchApiException
+ *   If an error occurred during the search.
  */
 function search_api_page_search_execute(Entity $page, $keys, $limit = 10) {
   $offset = pager_find_page() * $limit;
@@ -235,10 +238,10 @@ function template_preprocess_search_api_page_results(array &$variables) {
   );
   $variables['classes'] = implode(' ', $classes_array);
 
-  // If other than native search_api_page_result view mode
-  // (Teaser, Full content, RSS and so forth)
+  // Distinguish between the native search_api_page_result "view mode" and
+  // proper entity view modes (e.g., Teaser, Full content, RSS and so forth).
   if ($variables['view_mode'] != 'search_api_page_result') {
-    $variables['search_results'] = entity_view($variables['index']->item_type, $variables['items'], $variables['view_mode']);
+    $variables['search_results'] = entity_view($variables['index']->getEntityType(), $variables['items'], $variables['view_mode']);
   }
   else {
     $variables['search_results'] = array();
@@ -251,7 +254,7 @@ function template_preprocess_search_api_page_results(array &$variables) {
       );
     }
   }
-  // Load css
+  // Load CSS.
   $base_path = drupal_get_path('module', 'search_api_page') . '/';
   drupal_add_css($base_path . 'search_api_page.css');
 }

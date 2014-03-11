@@ -1,5 +1,9 @@
 Search API Pages 1.x, dev (xx/xx/xxxx):
 ---------------------------------------
+- #2179399 by mparker17, drunken monkey: Fixed recognition of non-standard
+  entity indexes.
+- #2134731 by drunken monkey: Fixed notices when trying to display the block of
+  a disabled search page.
 
 Search API Pages 1.0 (09/01/2013):
 ----------------------------------

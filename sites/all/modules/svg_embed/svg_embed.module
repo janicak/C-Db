@@ -46,7 +46,7 @@ function svg_embed_locale($op = 'groups') {
 function svg_embed_menu() {
   $items['admin/config/regional/translate/svgextract'] = array(
     'title' => 'Embedded SVG',
-    'description' => 'Extracts strings from embedded SVG files into a po files for translation and re-imports them into the proper text group.',
+    'description' => 'Extracts strings from embedded SVG files into po files for translation and re-imports them into the proper text group.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('svg_embed_manage_po_files'),
     'access arguments' => array('translate interface'),
@@ -69,7 +69,7 @@ function svg_embed_filter_svg_embed_process($text, $filter, $format, $langcode, 
     $language = user_preferred_language($user);
     $langcode = $language->language;
   }
-  if (preg_match_all("/\[svg:([a-zA-Z ._0123456789äöüÄÖÜ]*)\]/", $text, $matches, PREG_SET_ORDER)) {
+  if (preg_match_all("/\[svg:([^\\:;\?\*\{\}\/]+)\]/", $text, $matches, PREG_SET_ORDER)) {
     foreach ($matches as $match) {
       if (is_numeric($match[1])) {
         $field = 'fid';

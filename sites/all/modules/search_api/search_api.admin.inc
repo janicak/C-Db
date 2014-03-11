@@ -392,6 +392,7 @@ function search_api_admin_server_view(SearchApiServer $server, $action = NULL) {
     '#machine_name' => $server->machine_name,
     '#description' => $server->description,
     '#enabled' => $server->enabled,
+    '#class_id' => $server->class,
     '#class_name' => $class['name'],
     '#class_description' => $class['description'],
     '#indexes' => $indexes,
@@ -416,6 +417,7 @@ function search_api_admin_server_view(SearchApiServer $server, $action = NULL) {
  *   - machine_name: The server's machine name.
  *   - description: The server's description.
  *   - enabled: Boolean indicating whether the server is enabled.
+ *   - class_id: The used service class' ID.
  *   - class_name: The used service class' display name.
  *   - class_description: The used service class' description.
  *   - indexes: A list of indexes associated with this server, either as an HTML
@@ -423,8 +425,8 @@ function search_api_admin_server_view(SearchApiServer $server, $action = NULL) {
  *   - options: An HTML string or render array containing information about the
  *     server's service-specific settings.
  *   - status: The entity configuration status (in database, in code, etc.).
- *   - extra: An associative array of additional server information, with the
- *     keys being the labels and the values being the information.
+ *   - extra: An array of additional server information in the format specified
+ *     by SearchApiAbstractService::getExtraInformation().
  *
  * @return string
  *   HTML for displaying a server.
@@ -435,6 +437,7 @@ function theme_search_api_server(array $variables) {
   $machine_name = $variables['machine_name'];
   $description = $variables['description'];
   $enabled = $variables['enabled'];
+  $class_id = $variables['class_id'];
   $class_name = $variables['class_name'];
   $indexes = $variables['indexes'];
   $options = $variables['options'];
@@ -477,7 +480,7 @@ function theme_search_api_server(array $variables) {
 
   $label = t('Service class');
   if (module_exists('help')) {
-    $url_options['fragment'] = drupal_clean_css_identifier('search_api_solr_service');
+    $url_options['fragment'] = drupal_clean_css_identifier($class_id);
     $info = l($class_name, 'admin/help/search_api', $url_options);
   }
   else {
@@ -831,6 +834,15 @@ function search_api_admin_index_view(SearchApiIndex $index, $action = NULL) {
   }
 
   $status = search_api_index_status($index);
+  try {
+    $server = $index->server();
+  }
+  catch (SearchApiException $e) {
+    $server = NULL;
+    $vars['%server'] = $index->server;
+    $message = t('The index has an unknown server (ID: %server) set. Please check the index settings.', $vars);
+    drupal_set_message($message, 'error');
+  }
   $ret['view'] = array(
     '#theme' => 'search_api_index',
     '#id' => $index->id,
@@ -839,15 +851,21 @@ function search_api_admin_index_view(SearchApiIndex $index, $action = NULL) {
     '#description' => $index->description,
     '#item_type' => $index->item_type,
     '#enabled' => $index->enabled,
-    '#server' => $index->server(),
+    '#server' => $server,
     '#options' => $index->options,
     '#fields' => $index->getFields(),
     '#indexed_items' => $status['indexed'],
-    '#on_server' => _search_api_get_items_on_server($index),
+    '#on_server' => NULL,
     '#total_items' => $status['total'],
     '#status' => $index->status,
     '#read_only' => $index->read_only,
   );
+  try{
+    $ret['view']['#on_server'] = _search_api_get_items_on_server($index);
+  }
+  catch (SearchApiException $e) {
+    watchdog_exception('search_api', $e);
+  }
   if ($index->enabled && !$index->read_only) {
     $ret['form'] = drupal_get_form('search_api_admin_index_status_form', $index, $status);
   }
@@ -870,7 +888,8 @@ function search_api_admin_index_view(SearchApiIndex $index, $action = NULL) {
  *   - fields: All indexed fields of the index.
  *   - indexed_items: The number of items already indexed in their latest
  *     version on this index.
- *   - on_server: The number of items actually indexed on the server.
+ *   - on_server: The number of items actually indexed on the server. NULL if
+ *     the search for finding out the item count failed.
  *   - total_items: The total number of items that have to be indexed for this
  *     index.
  *   - status: The entity configuration status (in database, in code, etc.).
@@ -960,33 +979,23 @@ function theme_search_api_index(array $variables) {
     $rows[] = _search_api_deep_copy($row);
 
     $theme = array(
-      'percent' => (int) (100 * $indexed_items / $total_items),
+      'percent' => $total_items ? (int) (100 * $indexed_items / $total_items) : 100,
       'message' => t('@indexed/@total indexed', array('@indexed' => $indexed_items, '@total' => $total_items)),
     );
     $output .= '<h3>' . t('Index status') . '</h3>';
     $output .= '<div class="search-api-index-status">' . theme('progress_bar', $theme) . '</div>';
 
-    if ($on_server != $total_items) {
-      if ($on_server < $indexed_items || $on_server > $total_items) {
-        $vars = array();
-        $vars['@num'] = $on_server;
-        if ($on_server < $indexed_items) {
-          $vars['@diff'] = $indexed_items - $on_server;
-          $info = t('The index status on the search server has diverged (@num items indexed – @diff less than required). You are strongly advised to mark the index for re-indexing using the form below.', $vars);
-        }
-        else {
-          $vars['@diff'] = $on_server - $total_items;
-          $info = t('The index status on the search server has diverged (@num items indexed – @diff more than present). You are strongly advised to clear the index using the form below.', $vars);
-        }
-        $class = 'error';
-      }
-      else {
-        $info = format_plural($on_server, 'There is 1 item indexed on the server for this index.', 'There are @count items indexed on the server for this index.');
-        $class = 'warning';
-      }
-      $label = t('Server index status');
-      $rows[] = _search_api_deep_copy($row);
+    if (!isset($on_server)) {
+      $info = t('An error occurred while trying to determine the server index status. Please check the logs for details.');
+      $class = 'error';
     }
+    else {
+      $vars['@url'] = url('https://drupal.org/node/2009804#server-index-status');
+      $info = format_plural($on_server, 'There is 1 item indexed on the server for this index. (<a href="@url">More information</a>)', 'There are @count items indexed on the server for this index. (<a href="@url">More information</a>)', $vars);
+      $class = '';
+    }
+    $label = t('Server index status');
+    $rows[] = _search_api_deep_copy($row);
   }
 
   if ($status != ENTITY_CUSTOM) {
@@ -1191,12 +1200,21 @@ function search_api_admin_index_edit(array $form, array &$form_state, SearchApiI
     '#default_value' => $index->name,
     '#required' => TRUE,
   );
+  try {
+    $enabled_fixed = !$index->enabled && !$index->server();
+  }
+  catch (Exception $e) {
+    watchdog_exception('search_api', $e);
+    // The exception only occurs if the index is disabled, and for an unknown
+    // server we of course want do prevent the index from being enabled.
+    $enabled_fixed = TRUE;
+  }
   $form['enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enabled'),
     '#default_value' => $index->enabled,
     // Can't enable an index lying on a disabled server, or no server at all.
-    '#disabled' => !$index->enabled && (!$index->server() || !$index->server()->enabled),
+    '#disabled' => $enabled_fixed,
   );
   $form['description'] = array(
     '#type' => 'textarea',
@@ -2101,7 +2119,7 @@ function search_api_admin_confirm(array $form, array &$form_state, $type, $actio
           break;
 
         case 'disable':
-          array(
+          $text = array(
             t('Disable server @name', array('@name' => $entity->name)),
             t('Do you really want to disable this server?'),
             t('This will disconnect all indexes from this server and disable them. Searches on these indexes will not be available until they are added to another server and re-enabled. All indexed data (except for read-only indexes) on this server will be cleared.'),
@@ -2222,8 +2240,16 @@ function search_api_admin_confirm_submit(array $form, array &$form_state) {
   $action = $values['action'];
   $id = $values['id'];
 
+  $success = FALSE;
   $function = "search_api_{$type}_{$action}";
-  if ($function($id)) {
+  try {
+    // Some actions, like disabling, can actually throw an exception.
+    $success = $function($id);
+  }
+  catch (SearchApiException $e) {
+    watchdog_exception('search_api', $e);
+  }
+  if ($success) {
     drupal_set_message($values['message']);
   }
   else {

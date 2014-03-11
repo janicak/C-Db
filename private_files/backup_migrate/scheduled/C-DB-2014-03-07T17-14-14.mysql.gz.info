@@ -1,0 +1,8 @@
+filename = "C-DB-2014-03-07T17-14-14"
+description = ""
+datestamp = "1394241255"
+generator = "Backup and Migrate (http://drupal.org/project/backup_migrate)"
+generatorversion = "7.x-2.x"
+sites[0][version] = "7.26"
+sites[0][name] = "C-DB"
+sites[0][url] = "http://cdb.local/publications"

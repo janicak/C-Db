@@ -309,7 +309,7 @@ class SearchApiHighlight extends SearchApiAbstractProcessor {
         // Locate a keyword (position $p, always >0 because $text starts with a
         // space).
         $p = 0;
-        if (preg_match('/' . self::$boundary . $key . self::$boundary . '/iu', $text, $match, PREG_OFFSET_CAPTURE, $included[$key])) {
+        if (preg_match('/' . self::$boundary . preg_quote($key, '/') . self::$boundary . '/iu', $text, $match, PREG_OFFSET_CAPTURE, $included[$key])) {
           $p = $match[0][1];
         }
         // Now locate a space in front (position $q) and behind it (position $s),
@@ -395,7 +395,8 @@ class SearchApiHighlight extends SearchApiAbstractProcessor {
    */
   protected function highlightField($text, array $keys) {
     $replace = $this->options['prefix'] . '\0' . $this->options['suffix'];
-    $text = preg_replace('/' . self::$boundary . '(' . implode('|', $keys) . ')' . self::$boundary . '/iu', $replace, ' ' . $text . ' ');
+    $keys = implode('|', array_map('preg_quote', $keys, array_fill(0, count($keys), '/')));
+    $text = preg_replace('/' . self::$boundary . '(' . $keys . ')' . self::$boundary . '/iu', $replace, ' ' . $text . ' ');
     return substr($text, 1, -1);
   }
 

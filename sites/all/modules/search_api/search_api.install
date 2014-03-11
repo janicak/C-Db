@@ -349,8 +349,13 @@ function search_api_enable() {
     }
   }
   foreach ($types as $type => $indexes) {
-    $controller = search_api_get_datasource_controller($type);
-    $controller->startTracking($indexes);
+    try {
+      $controller = search_api_get_datasource_controller($type);
+      $controller->startTracking($indexes);
+    }
+    catch (SearchApiException $e) {
+      watchdog_exception('search_api', $e);
+    }
   }
 }
 
@@ -964,5 +969,31 @@ function search_api_update_7116() {
       $insert->values($task);
     }
     $insert->execute();
+  }
+}
+
+/**
+ * Checks the database for illegal {search_api_index}.server values.
+ */
+function search_api_update_7117() {
+  $servers = db_select('search_api_server', 's')
+    ->fields('s', array('machine_name'))
+    ->condition('enabled', 1);
+  $indexes = db_select('search_api_index', 'i')
+    ->fields('i', array('id'))
+    ->condition('server', $servers, 'NOT IN')
+    ->execute()
+    ->fetchCol();
+  if ($indexes) {
+    db_delete('search_api_item')
+      ->condition('index_id', $indexes)
+      ->execute();
+    db_update('search_api_index')
+      ->fields(array(
+        'server' => NULL,
+        'enabled' => 0,
+      ))
+      ->condition('id', $indexes)
+      ->execute();
   }
 }

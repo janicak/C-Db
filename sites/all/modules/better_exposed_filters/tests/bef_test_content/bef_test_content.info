@@ -2,6 +2,7 @@ name = BEF Test Content
 description = Content and Views for testing Better Exposed Filters.
 core = 7.x
 package = BEF Tests
+hidden = TRUE
 php = 5.2.4
 dependencies[] = better_exposed_filters
 dependencies[] = date
@@ -40,9 +41,9 @@ features_exclude[field][node-bef_test-field_integer] = node-bef_test-field_integ
 features_exclude[field][node-bef_test-field_price] = node-bef_test-field_price
 features_exclude[field][node-bef_test-field_date] = node-bef_test-field_date
 
-; Information added by Drupal.org packaging script on 2014-02-16
-version = "7.x-3.0-beta4+4-dev"
+; Information added by Drupal.org packaging script on 2014-03-08
+version = "7.x-3.0-beta4+6-dev"
 core = "7.x"
 project = "better_exposed_filters"
-datestamp = "1392512612"
+datestamp = "1394237906"
 

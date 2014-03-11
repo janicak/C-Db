@@ -90,7 +90,8 @@ abstract class SearchApiViewsHandlerFilterEntity extends SearchApiViewsHandlerFi
 
     // Set the correct default value in case the admin-set value is used (and a
     // value is present). The value is used if the form is either not exposed,
-    // or the exposed form wasn't submitted yet (there is
+    // or the exposed form wasn't submitted yet. (There doesn't seem to be an
+    // easier way to check for that.)
     if ($this->value && (empty($form_state['input']) || !empty($form_state['input']['live_preview']))) {
       $form['value']['#default_value'] = $this->ids_to_strings($this->value);
     }
@@ -193,13 +194,15 @@ abstract class SearchApiViewsHandlerFilterEntity extends SearchApiViewsHandlerFi
       $this->query->condition($this->real_field, NULL, '<>', $this->options['group']);
     }
     elseif (is_array($this->value)) {
+      $all_of = $this->operator === 'all of';
+      $operator = $all_of ? '=' : $this->operator;
       if (count($this->value) == 1) {
-        $this->query->condition($this->real_field, reset($this->value), $this->operator, $this->options['group']);
+        $this->query->condition($this->real_field, reset($this->value), $operator, $this->options['group']);
       }
       else {
-        $filter = $this->query->createFilter($this->operator === '<>' || $this->operator === 'all of' ? 'AND' : 'OR');
+        $filter = $this->query->createFilter($operator === '<>' || $all_of ? 'AND' : 'OR');
         foreach ($this->value as $value) {
-          $filter->condition($this->real_field, $value, $this->operator === 'all of' ? '=' : $this->operator);
+          $filter->condition($this->real_field, $value, $operator);
         }
         $this->query->filter($filter, $this->options['group']);
       }

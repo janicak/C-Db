@@ -209,6 +209,10 @@ a.facetapi-inactive span.badge {
 }
 
 
+
+
+
+
 /** LOCATION SELECT WIDGET **/
 #edit-field-locations-wrapper {
 	display: block;
@@ -360,11 +364,12 @@ table.dataTable tr.even td.sorting_1 {
 }
 
 
-/** CHOSEN SELECT **/
+/** CHOSEN SELECT 
 .chosen-container {
 	width:100%;
 }
-.chosen-container .chosen-single {
+.chosen-container .chosen-single,
+.chosen-container-multi {
     border: 1px solid #dddCCC;
     border-radius: 4px;
     color: #555555;
@@ -377,10 +382,11 @@ table.dataTable tr.even td.sorting_1 {
     vertical-align: middle;
 	width:100%;
 }
-.chosen-single div b {
+.chosen-single div b,
+.chosen-container-multi div b {
 	background-position: 0px 7px !important;
 }
-
+**/
 
 
 /** VIEW MODE MODAL LINK **/

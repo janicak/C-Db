@@ -8,9 +8,9 @@ files[] = views_flipped_table.module
 files[] = views_flipped_table.views.inc
 files[] = views_flipped_table.module
 files[] = views_flipped_table_plugin_style_flipped_table.inc
-; Information added by drupal.org packaging script on 2013-10-19
-version = "7.x-1.0+3-dev"
+; Information added by Drupal.org packaging script on 2014-02-26
+version = "7.x-1.0+4-dev"
 core = "7.x"
 project = "views_flipped_table"
-datestamp = "1382164798"
+datestamp = "1393387405"
 
