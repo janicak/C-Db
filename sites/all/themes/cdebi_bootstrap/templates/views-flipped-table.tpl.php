@@ -33,7 +33,7 @@
 
   <tbody>
     <?php foreach ($rows_flipped as $field_name => $row) : ?>
-      <tr class="<?php print $wrapper_classes[$field_name]; ?>">
+      <tr class="<?php if (isset($wrapper_classes)) print $wrapper_classes[$field_name]; ?>">
         <th class="<?php print($header_classes[$field_name]); ?>">
           <?php echo $header[$field_name]; ?>
         </th>
